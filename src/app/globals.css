@@ -216,3 +216,113 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Split-flap counter ────────────────────────────────────────────────
+   A mechanical flip clock. Each digit is two half-height cards stacked into
+   one glyph: the top card is masked to the upper half of the numeral, the
+   bottom card to the lower half.
+
+   A tick drops a hinged leaf. Two extra cards are mounted for the duration:
+   an upper leaf carrying the OLD digit, which falls forward from 0 to -90deg
+   about its bottom edge, and a lower leaf carrying the NEW digit, which
+   swings up from 90deg to 0 about its top edge once the first has cleared.
+   The static cards underneath already hold the new top and the old bottom,
+   so what the eye follows is a single flap turning over.                   */
+
+.flip {
+  --flip-h: 4.75rem;
+  --flip-w: 3.1rem;
+  position: relative;
+  width: var(--flip-w);
+  height: var(--flip-h);
+  perspective: 380px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 640px) {
+  .flip {
+    --flip-h: 6rem;
+    --flip-w: 4rem;
+  }
+}
+
+/* The notches either side of the hinge, where a real unit would be pinned. */
+.flip::before,
+.flip::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 4px);
+  z-index: 3;
+  width: 5px;
+  height: 8px;
+  background: var(--color-ink-950);
+  border-radius: 2px;
+}
+.flip::before { left: -2px; }
+.flip::after { right: -2px; }
+
+.flip-half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+
+.flip-half-top {
+  top: 0;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #241b15, #191209);
+  /* The seam. Darker than the card so the two halves read as separate
+     pieces of plastic rather than one panel with a line drawn on it. */
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.85);
+}
+
+.flip-half-bottom {
+  bottom: 0;
+  border-radius: 0 0 8px 8px;
+  background: linear-gradient(180deg, #120c08, #0b0705);
+  box-shadow: inset 0 1px 0 rgb(255 248 236 / 0.07);
+}
+
+.flip-half > span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: var(--flip-h);
+  line-height: var(--flip-h);
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: calc(var(--flip-h) * 0.66);
+  font-weight: 900;
+  color: var(--color-cream-100);
+}
+
+/* Each half shows the numeral at full height, anchored so the overflow
+   crops it to the correct half. */
+.flip-half-top > span { top: 0; }
+.flip-half-bottom > span { bottom: 0; }
+
+.flip-leaf { z-index: 2; }
+
+.flip-leaf-top {
+  transform-origin: 50% 100%;
+  animation: flip-out 0.28s ease-in forwards;
+}
+
+.flip-leaf-bottom {
+  transform-origin: 50% 0%;
+  transform: rotateX(90deg);
+  animation: flip-in 0.28s 0.28s ease-out forwards;
+}
+
+@keyframes flip-out {
+  from { transform: rotateX(0deg); }
+  to   { transform: rotateX(-90deg); }
+}
+
+@keyframes flip-in {
+  from { transform: rotateX(90deg); }
+  to   { transform: rotateX(0deg); }
+}

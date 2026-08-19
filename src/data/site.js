@@ -8,9 +8,10 @@ export const festival = {
   name: "ENGENIA",
   year: "2026",
   tagline: "Experience the Extravaganza",
-  dates: "Sep 29, 30 — 2026",
-  // Used by the hero countdown. Update when the 2026 dates are locked.
-  startsAt: "2026-09-29T09:00:00+05:30",
+  dates: "Sep 11 — 2026",
+  // Used by the hero countdown. Pinned to IST, so the clock hits zero at the
+  // opening in Chennai and not in whatever timezone the reader happens to be.
+  startsAt: "2026-09-11T09:00:00+05:30",
   college: "Loyola-ICAM College of Engineering and Technology",
   collegeShort: "LICET",
   location: "Bertram Hall, Loyola Campus, Chennai",

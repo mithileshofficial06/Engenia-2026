@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
 
 const UNITS = [
   { key: "days", label: "Days" },
@@ -9,6 +8,9 @@ const UNITS = [
   { key: "minutes", label: "Mins" },
   { key: "seconds", label: "Secs" },
 ];
+
+// Must match the two 0.28s halves of the flip in globals.css.
+const FLIP_MS = 560;
 
 function diff(target) {
   const ms = Math.max(0, new Date(target).getTime() - Date.now());
@@ -21,6 +23,74 @@ function diff(target) {
   };
 }
 
+/** Two cards, or three once a unit runs past 99 — days will, if the target is
+ *  far enough out. Pre-mount the value is null and the cards read as dashes. */
+function digitsOf(value) {
+  if (value == null) return ["-", "-"];
+  return String(value).padStart(2, "0").split("");
+}
+
+/**
+ * One digit of the counter.
+ *
+ * While a flip is in flight the component holds two values at once: `shown`
+ * is what the static cards still display, `incoming` is what the leaves are
+ * bringing in. The leaves carry a React key so a new tick remounts them and
+ * restarts the CSS animation from the top — without it a flip landing while
+ * the previous one is still running would simply not play.
+ */
+function FlipDigit({ digit }) {
+  const [shown, setShown] = useState(digit);
+  const [incoming, setIncoming] = useState(null);
+
+  useEffect(() => {
+    if (digit === shown) return;
+
+    // Coming out of the pre-mount dash there is nothing to flip away from,
+    // so the first real value is swapped in rather than animated.
+    if (!/\d/.test(shown)) {
+      setShown(digit);
+      return;
+    }
+
+    setIncoming(digit);
+    const id = setTimeout(() => {
+      setShown(digit);
+      setIncoming(null);
+    }, FLIP_MS);
+    return () => clearTimeout(id);
+  }, [digit, shown]);
+
+  // The static top already carries the new numeral; the falling leaf is what
+  // hides it until the flip completes.
+  const next = incoming ?? shown;
+
+  return (
+    <div className="flip" aria-hidden>
+      <div className="flip-half flip-half-top">
+        <span>{next}</span>
+      </div>
+      <div className="flip-half flip-half-bottom">
+        <span>{shown}</span>
+      </div>
+
+      {incoming !== null && (
+        <>
+          <div key={`out-${incoming}`} className="flip-half flip-half-top flip-leaf flip-leaf-top">
+            <span>{shown}</span>
+          </div>
+          <div
+            key={`in-${incoming}`}
+            className="flip-half flip-half-bottom flip-leaf flip-leaf-bottom"
+          >
+            <span>{incoming}</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function Countdown({ target }) {
   // null until mounted so server and client markup agree.
   const [time, setTime] = useState(null);
@@ -31,25 +101,30 @@ export default function Countdown({ target }) {
     return () => clearInterval(id);
   }, [target]);
 
+  // The cards are decorative markup — split glyphs across four elements read
+  // as nonsense aloud — so the whole counter is announced as one line here.
+  const spoken = time
+    ? `${time.days} days, ${time.hours} hours, ${time.minutes} minutes and ${time.seconds} seconds until the festival opens`
+    : "Counting down to the festival";
+
   return (
-    <div className="flex items-stretch gap-2 sm:gap-3">
-      {UNITS.map((unit, i) => (
-        <motion.div
-          key={unit.key}
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 + i * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="glass relative flex min-w-[68px] flex-col items-center rounded-xl px-3 py-3 sm:min-w-[86px] sm:px-4 sm:py-4"
-        >
-          <span className="font-display text-2xl font-bold leading-none tabular-nums text-cream-100 sm:text-4xl">
-            {time ? String(time[unit.key]).padStart(2, "0") : "--"}
-          </span>
-          <span className="mt-2 text-[9px] font-medium uppercase tracking-[0.22em] text-white/45 sm:text-[10px]">
-            {unit.label}
-          </span>
-          <span className="bg-fest absolute inset-x-3 bottom-0 h-px opacity-60" />
-        </motion.div>
-      ))}
+    <div role="timer" aria-label={spoken}>
+      <span className="sr-only">{spoken}</span>
+
+      <div aria-hidden className="flex items-start gap-3 sm:gap-5">
+        {UNITS.map((unit) => (
+          <div key={unit.key} className="flex flex-col items-center gap-3">
+            <div className="flex gap-1.5 sm:gap-2">
+              {digitsOf(time?.[unit.key]).map((d, i) => (
+                <FlipDigit key={i} digit={d} />
+              ))}
+            </div>
+            <span className="text-[9px] font-medium uppercase tracking-[0.22em] text-white/45 sm:text-[10px]">
+              {unit.label}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
