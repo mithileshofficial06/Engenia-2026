@@ -3,13 +3,13 @@
  * standing in for the flat gradient hairlines. Takes `currentColor`, so a
  * section's accent drives it.
  */
-export default function BrushRule({ className = "", width = 128 }) {
+export default function BrushRule({ className = "", width = 128, style }) {
   return (
     <svg
       aria-hidden
       viewBox="0 0 200 12"
       preserveAspectRatio="none"
-      style={{ width, height: 9 }}
+      style={{ width, height: 9, ...style }}
       className={className}
       fill="currentColor"
     >
