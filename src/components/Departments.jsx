@@ -28,9 +28,9 @@ export default function Departments() {
   const still = useReducedMotion();
 
   return (
-    <section id="departments" {...sectionAccent("jade")} className="relative px-4 py-24 sm:py-32 md:px-8">
+    <section id="departments" {...sectionAccent("jade")} className="relative px-4 py-16 sm:py-24 md:px-8">
       <div className="mx-auto max-w-6xl">
-        <Flourish className="mx-auto mb-9 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
+        <Flourish className="mx-auto mb-6 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
 
         <SectionHeading
           eyebrow="The contenders"
@@ -41,7 +41,7 @@ export default function Departments() {
 
         {/* The hall: a gilded rail with seven banners hung off it. Standings
             live on the leaderboard — this section is only about who competes. */}
-        <div className="relative mt-24">
+        <div className="relative mt-16">
           {/* rail, with a soft glow and tapered ends */}
           <span
             aria-hidden
@@ -171,10 +171,10 @@ export default function Departments() {
           </ul>
         </div>
 
-        <Reveal from="up" delay={0.1} className="mt-16 flex justify-center">
+        <Reveal from="up" delay={0.1} className="mt-12 flex justify-center">
           <Link
             href="/leaderboard"
-            className="glass group inline-flex items-center gap-2.5 rounded-full px-7 py-3.5 text-sm font-semibold text-cream-200/85 transition-colors duration-300 hover:text-cream-100"
+            className="btn btn-ghost group inline-flex items-center gap-2.5 px-8 py-4 text-sm font-semibold"
           >
             See who is ahead
             <span className="text-[11px] uppercase tracking-[0.24em] text-cream-400/70">full standings</span>

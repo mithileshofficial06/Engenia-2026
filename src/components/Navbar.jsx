@@ -42,7 +42,7 @@ export default function Navbar() {
         <nav
           className={`mx-auto flex max-w-7xl items-center justify-between rounded-2xl px-4 py-2.5 transition-all duration-500 md:px-6 ${
             scrolled
-              ? "glass glass-blur shadow-[0_18px_60px_-24px_rgba(211,19,62,.5)]"
+              ? "glass glass-blur"
               : "border border-transparent bg-transparent"
           }`}
         >
@@ -69,7 +69,7 @@ export default function Navbar() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={`relative rounded-full px-4 py-2 text-sm font-medium tracking-wide transition-colors ${
+                    className={`relative px-4 py-2 text-sm font-medium tracking-wide transition-colors ${
                       active ? "text-cream-100" : "text-white/60 hover:text-cream-100"
                     }`}
                   >
@@ -77,7 +77,7 @@ export default function Navbar() {
                       <motion.span
                         layoutId="nav-pill"
                         transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                        className="absolute inset-0 rounded-full bg-white/[0.09] ring-1 ring-white/10"
+                        className="absolute inset-0 bg-white/[0.09] ring-1 ring-white/10"
                       />
                     )}
                     <span className="relative z-10">{link.label}</span>
@@ -90,7 +90,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <Link
               href="/events"
-              className="bg-fest hidden rounded-full px-5 py-2.5 text-sm font-semibold text-ink-950 shadow-[0_8px_28px_-8px_rgba(244,113,21,.9)] transition-transform duration-300 hover:scale-[1.04] active:scale-95 md:inline-block"
+              className="btn btn-solid hidden px-6 py-3 text-sm font-semibold md:inline-block"
             >
               Explore Events
             </Link>
@@ -100,7 +100,7 @@ export default function Navbar() {
               onClick={() => setOpen((v) => !v)}
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
-              className="glass flex h-10 w-10 items-center justify-center rounded-full text-cream-100 md:hidden"
+              className="glass flex h-10 w-10 items-center justify-center text-cream-100 transition-colors hover:bg-white/[0.08] md:hidden"
             >
               {open ? <X size={18} /> : <Menu size={18} />}
             </button>

@@ -15,7 +15,6 @@ export const festival = {
   college: "Loyola-ICAM College of Engineering and Technology",
   collegeShort: "LICET",
   location: "Bertram Hall, Loyola Campus, Chennai",
-  edition: "Annual Inter-Department Cultural Fest",
 };
 
 export const navLinks = [

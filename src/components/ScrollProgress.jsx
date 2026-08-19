@@ -10,7 +10,7 @@ export default function ScrollProgress() {
     <motion.div
       aria-hidden
       style={{ scaleX }}
-      className="bg-arc fixed inset-x-0 top-0 z-[70] h-[3px] origin-left shadow-[0_0_18px_rgba(211,19,62,.65)]"
+      className="bg-arc fixed inset-x-0 top-0 z-[70] h-[3px] origin-left"
     />
   );
 }

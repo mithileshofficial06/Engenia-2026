@@ -33,21 +33,6 @@ export default function Hero() {
       />
 
       <div className="relative z-10 flex w-full flex-col items-center">
-        <motion.div style={{ opacity: fade }} className="mb-9">
-          <motion.p
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.35, duration: 0.7 }}
-            className="glass inline-flex items-center gap-2.5 rounded-full px-4 py-2 text-[10px] font-medium uppercase tracking-[0.3em] text-white/65 sm:text-[11px]"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="bg-fest absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" />
-              <span className="bg-fest relative inline-flex h-2 w-2 rounded-full" />
-            </span>
-            {festival.edition}
-          </motion.p>
-        </motion.div>
-
         {/* Reserves the wordmark's space and marks where the flight starts.
             The letters themselves are drawn by WordmarkFlight, fixed to the
             viewport, so this section cannot clip them on their way out. */}
@@ -102,35 +87,20 @@ export default function Hero() {
           >
             <Link
               href="/events"
-              className="bg-fest group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-ink-950 shadow-[0_16px_44px_-14px_rgba(211,19,62,.95)] transition-transform duration-300 hover:scale-[1.04] active:scale-95"
+              className="btn btn-solid group inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold"
             >
               Explore Events
               <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
             <Link
               href="/leaderboard"
-              className="glass inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white/85 transition-colors duration-300 hover:text-cream-100"
+              className="btn btn-ghost inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold"
             >
               Live Leaderboard
             </Link>
           </motion.div>
         </motion.div>
       </div>
-
-      <motion.div
-        style={{ opacity: fade }}
-        className="absolute bottom-7 left-1/2 z-10 -translate-x-1/2"
-      >
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="flex flex-col items-center gap-2"
-        >
-          <span className="text-[9px] uppercase tracking-[0.4em] text-white/30">Scroll</span>
-          <span className="h-10 w-px bg-gradient-to-b from-white/35 to-transparent" />
-        </motion.div>
-      </motion.div>
     </section>
   );
 }

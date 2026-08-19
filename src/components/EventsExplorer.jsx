@@ -42,7 +42,7 @@ function Pill({ active, group, children, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`relative rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition-colors ${
+      className={`relative px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition-colors ${
         active ? "text-ink-950" : "text-cream-400/70 hover:text-cream-100"
       }`}
     >
@@ -50,7 +50,7 @@ function Pill({ active, group, children, onClick }) {
         <motion.span
           layoutId={group}
           transition={{ type: "spring", stiffness: 360, damping: 30 }}
-          className="bg-fest absolute inset-0 rounded-full"
+          className="bg-fest absolute inset-0"
         />
       )}
       <span className="relative z-10">{children}</span>
@@ -66,7 +66,7 @@ function WinnerChips({ event }) {
         <span
           key={`${w.position}-${w.dept}`}
           title={`${MEDALS[w.position]?.label}: ${w.name ?? w.dept}`}
-          className={`flex h-6 w-6 items-center justify-center rounded-full bg-cream-100/[0.07] text-[9px] font-bold ring-1 ${
+          className={`flex h-6 w-6 items-center justify-center bg-cream-100/[0.07] text-[9px] font-bold ring-1 ${
             MEDALS[w.position]?.ring ?? "ring-cream-400/20"
           } ${MEDALS[w.position]?.text ?? "text-cream-300/70"}`}
         >
@@ -121,19 +121,19 @@ export default function EventsExplorer() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search the programme..."
             aria-label="Search events"
-            className="glass w-full rounded-full py-3 pl-11 pr-4 text-sm text-cream-100 placeholder:text-cream-400/50 focus:outline-none focus:ring-2 focus:ring-crimson-500/45"
+            className="glass w-full py-3 pl-11 pr-4 text-sm text-cream-100 placeholder:text-cream-400/50 focus:outline-none focus:ring-2 focus:ring-crimson-500/45"
           />
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <div className="glass flex rounded-full p-1">
+          <div className="glass flex p-1">
             {DIVISIONS.map((d) => (
               <Pill key={d} group="division-pill" active={division === d} onClick={() => setDivision(d)}>
                 {d === "ALL" ? "All stages" : d}
               </Pill>
             ))}
           </div>
-          <div className="glass flex rounded-full p-1">
+          <div className="glass flex p-1">
             {TYPES.map((t) => (
               <Pill key={t} group="type-pill" active={type === t} onClick={() => setType(t)}>
                 {t === "ALL" ? "Any format" : t}
@@ -148,7 +148,7 @@ export default function EventsExplorer() {
         </p>
       </div>
 
-      <div className="mx-auto mt-16 max-w-5xl px-4 md:px-8">
+      <div className="mx-auto mt-12 max-w-5xl px-4 md:px-8">
         {programme.map(({ date, day, onstage, offstage, count }, i) => (
           <motion.section
             key={date}
@@ -270,12 +270,12 @@ function PosterCard({ event, index, onOpen }) {
       <div className="relative">
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className="rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] ring-1 ring-gold-500/40"
+            className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] ring-1 ring-gold-500/40"
             style={{ color: GOLD }}
           >
             On stage
           </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-cream-100/[0.07] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-cream-300/70 ring-1 ring-cream-400/20">
+          <span className="inline-flex items-center gap-1 bg-cream-100/[0.07] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-cream-300/70 ring-1 ring-cream-400/20">
             {event.type === "TEAM" ? <Users size={10} /> : <User size={10} />}
             {event.type}
           </span>
@@ -382,7 +382,7 @@ function EventModal({ event, onClose }) {
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-cream-100/[0.08] text-cream-300/80 transition hover:bg-cream-100/15 hover:text-cream-100"
+          className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center bg-cream-100/[0.08] text-cream-300/80 transition hover:bg-cream-100/15 hover:text-cream-100"
         >
           <X size={16} />
         </button>
@@ -390,7 +390,7 @@ function EventModal({ event, onClose }) {
         <div className="p-6 sm:p-9">
           <div className="flex flex-wrap items-center gap-2 pr-10">
             <span
-              className={`rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] ${
+              className={`px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] ${
                 event.division === "ONSTAGE"
                   ? "bg-gold-500/15 text-gold-400 ring-1 ring-gold-500/30"
                   : "bg-crimson-500/15 text-crimson-400 ring-1 ring-crimson-500/30"
@@ -398,10 +398,10 @@ function EventModal({ event, onClose }) {
             >
               {event.division}
             </span>
-            <span className="rounded-full bg-cream-100/[0.06] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-cream-300/70 ring-1 ring-cream-400/20">
+            <span className="bg-cream-100/[0.06] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-cream-300/70 ring-1 ring-cream-400/20">
               {event.type}
             </span>
-            <span className="rounded-full bg-cream-100/[0.06] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-cream-300/70 ring-1 ring-cream-400/20">
+            <span className="bg-cream-100/[0.06] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-cream-300/70 ring-1 ring-cream-400/20">
               {statusOf(event.status).label}
             </span>
           </div>
@@ -465,14 +465,14 @@ function EventModal({ event, onClose }) {
                     className="flex items-center gap-4 rounded-xl bg-cream-100/[0.04] px-4 py-3 ring-1 ring-cream-400/12"
                   >
                     <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ring-1 ${MEDALS[w.position]?.ring} ${MEDALS[w.position]?.text}`}
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center text-[10px] font-bold ring-1 ${MEDALS[w.position]?.ring} ${MEDALS[w.position]?.text}`}
                     >
                       {MEDALS[w.position]?.label}
                     </span>
                     <span className="min-w-0 flex-1 text-sm font-medium text-cream-200/90">
                       {w.name || `${w.dept} team`}
                     </span>
-                    <span className="shrink-0 rounded-full bg-cream-100/[0.07] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-cream-300/70">
+                    <span className="shrink-0 bg-cream-100/[0.07] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-cream-300/70">
                       {w.dept}
                     </span>
                   </li>

@@ -170,6 +170,59 @@ body {
   color: transparent;
 }
 
+/* ── Buttons ──────────────────────────────────────────────────────────
+   Square corners, no coloured drop shadow, and a fill that wipes in from the
+   left on hover.
+
+   The old treatment was a pill carrying a 44px blurred colour shadow, scaled
+   up on hover. That is the same shape of problem the ambient orbs had: a
+   blurred shadow has to re-rasterise on every frame that the box changes
+   size, so the most expensive paint on the page fired on every button
+   hover.
+
+   The wipe is done with a second background layer growing from 0% to 100%
+   width rather than an overlay element, so no markup has to change and there
+   is no stacking-context fight with the bare text nodes inside these
+   buttons. Text colour is chosen to read against both ends of the wipe, so
+   the label stays legible while the fill is halfway across.               */
+
+@utility btn {
+  border-radius: 0;
+  background-repeat: no-repeat;
+  transition:
+    background-size 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 240ms ease;
+}
+
+/* Primary: the warm gradient, wiping to cream. Ink type reads on both. */
+@utility btn-solid {
+  background-image: linear-gradient(var(--color-cream-100), var(--color-cream-100)), var(--grad-fest);
+  background-size: 0% 100%, 100% 100%;
+  color: var(--color-ink-950);
+
+  &:hover,
+  &:focus-visible {
+    background-size: 100% 100%, 100% 100%;
+  }
+}
+
+/* Secondary: hairline box, wiping to a low cream wash. The label stays cream
+   throughout — a gradient fill here would leave half the text on ink and half
+   on colour mid-wipe. */
+@utility btn-ghost {
+  background-image: linear-gradient(rgb(255 248 236 / 0.14), rgb(255 248 236 / 0.14));
+  background-size: 0% 100%;
+  border: 1px solid rgb(255 248 236 / 0.2);
+  color: var(--color-cream-200);
+
+  &:hover,
+  &:focus-visible {
+    background-size: 100% 100%;
+    border-color: rgb(255 248 236 / 0.45);
+    color: var(--color-cream-100);
+  }
+}
+
 /* Solid fills, buttons, bars. */
 @utility bg-fest {
   background-image: var(--grad-fest);

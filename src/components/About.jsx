@@ -16,19 +16,19 @@ export default function About() {
   const opensOnE = about.body.startsWith("E");
 
   return (
-    <section id="about" {...sectionAccent("azure")} className="relative px-4 py-24 sm:py-32 md:px-8">
+    <section id="about" {...sectionAccent("azure")} className="relative px-4 py-16 sm:py-24 md:px-8">
       <div className="mx-auto max-w-6xl">
-        <Flourish className="mx-auto mb-9 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
+        <Flourish className="mx-auto mb-6 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
 
         <SectionHeading
           eyebrow="Who we are"
           title="About"
           accent="EnGenia"
-          subtitle={`${festival.edition} at ${festival.college}.`}
+          subtitle={`${festival.college}.`}
         />
 
         {/* ── The spread: prose left, figures right ──────────────────── */}
-        <div className="mt-16 grid gap-10 md:grid-cols-[1.55fr_1fr] md:gap-14">
+        <div className="mt-12 grid gap-10 md:grid-cols-[1.55fr_1fr] md:gap-12">
           <Reveal from="right">
             <div className="relative">
               {/* Drop cap cut from the logo's own E, with the paragraph set to
@@ -76,7 +76,7 @@ export default function About() {
         </div>
 
         {/* ── The four pillars, each carrying a figure from the logo ──── */}
-        <div className="mt-16 grid gap-3 sm:gap-4 md:grid-cols-2">
+        <div className="mt-12 grid gap-3 sm:gap-4 md:grid-cols-2">
           {about.pillars.map((pillar, i) => (
             <Reveal key={pillar.title} from="up" delay={0.06 * i}>
               <motion.article

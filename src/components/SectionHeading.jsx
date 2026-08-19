@@ -14,7 +14,7 @@ export default function SectionHeading({ eyebrow, title, accent, subtitle, align
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-cream-300/75"
+          className="glass inline-flex items-center gap-2.5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-cream-300/75"
         >
           <span
             className="h-1.5 w-1.5 rounded-full"

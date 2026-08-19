@@ -32,9 +32,9 @@ function Logo({ sponsor, size = "md" }) {
 
 export default function Sponsors() {
   return (
-    <section id="sponsors" {...sectionAccent("gold")} className="relative overflow-hidden py-24 sm:py-32">
+    <section id="sponsors" {...sectionAccent("gold")} className="relative overflow-hidden py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-8">
-        <Flourish className="mx-auto mb-9 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
+        <Flourish className="mx-auto mb-6 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
 
         <SectionHeading
           eyebrow="With thanks"
@@ -44,14 +44,14 @@ export default function Sponsors() {
         />
 
         {/* Title sponsor */}
-        <Reveal from="scale" delay={0.1} className="mt-14">
+        <Reveal from="scale" delay={0.1} className="mt-10">
           <div className="glass relative mx-auto flex max-w-2xl flex-col items-center overflow-hidden rounded-3xl px-6 py-10 sm:px-12">
             <span className="bg-arc absolute inset-x-0 top-0 h-px" />
             <span
               aria-hidden
               className="pointer-events-none absolute inset-x-0 -top-24 mx-auto h-48 w-48 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-rgb)_/_.3),transparent_65%)] blur-2xl"
             />
-            <span className="bg-fest relative rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950">
+            <span className="bg-fest relative px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950">
               {titleSponsor.label}
             </span>
 
@@ -73,7 +73,7 @@ export default function Sponsors() {
       </div>
 
       {/* Marquee of other sponsors */}
-      <div className="mt-16">
+      <div className="mt-12">
         <p className="mb-8 text-center text-[10px] font-medium uppercase tracking-[0.34em] text-white/35">
           Other Sponsors
         </p>

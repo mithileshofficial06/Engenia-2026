@@ -54,9 +54,9 @@ export default function Highlights() {
   }, []);
 
   return (
-    <section id="highlights" {...sectionAccent("crimson")} className="relative py-24 sm:py-32">
+    <section id="highlights" {...sectionAccent("crimson")} className="relative py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-8">
-        <Flourish className="mx-auto mb-9 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
+        <Flourish className="mx-auto mb-6 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
 
         <SectionHeading
           eyebrow="Look back"
@@ -66,7 +66,7 @@ export default function Highlights() {
         />
       </div>
 
-      <div className="relative mt-14">
+      <div className="relative mt-10">
         <div
           ref={trackRef}
           className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 pb-6 md:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -115,7 +115,7 @@ export default function Highlights() {
                 onClick={() => scrollTo(i)}
                 aria-label={`Go to highlight ${i + 1}`}
                 aria-current={active === i}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
+                className={`h-1.5 transition-all duration-300 ${
                   active === i ? "bg-fest w-8" : "w-1.5 bg-white/20 hover:bg-white/40"
                 }`}
               />
@@ -128,7 +128,7 @@ export default function Highlights() {
               onClick={() => scrollTo(active - 1)}
               disabled={active === 0}
               aria-label="Previous highlight"
-              className="glass flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition disabled:opacity-30 enabled:hover:text-cream-100"
+              className="glass flex h-10 w-10 items-center justify-center text-white/80 transition disabled:opacity-30 enabled:hover:bg-white/[0.08] enabled:hover:text-cream-100"
             >
               <ChevronLeft size={18} />
             </button>
@@ -137,7 +137,7 @@ export default function Highlights() {
               onClick={() => scrollTo(active + 1)}
               disabled={active === highlights.length - 1}
               aria-label="Next highlight"
-              className="glass flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition disabled:opacity-30 enabled:hover:text-cream-100"
+              className="glass flex h-10 w-10 items-center justify-center text-white/80 transition disabled:opacity-30 enabled:hover:bg-white/[0.08] enabled:hover:text-cream-100"
             >
               <ChevronRight size={18} />
             </button>

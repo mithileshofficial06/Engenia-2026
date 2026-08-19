@@ -15,7 +15,7 @@ export default function Footer() {
             <Image src={LOGO_SRC} alt={`${festival.name} ${festival.year}`} fill sizes="144px" className="object-contain object-left" />
           </Link>
           <p className="mt-5 max-w-sm text-pretty text-sm leading-relaxed text-white/50">
-            {festival.edition} at {festival.college}.
+            {festival.college}.
           </p>
           <p className="text-fest font-display mt-5 text-lg font-bold">{festival.tagline}</p>
         </div>
@@ -59,7 +59,7 @@ export default function Footer() {
                 href={s.href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="glass rounded-full px-3.5 py-1.5 text-[11px] font-medium text-white/65 transition-colors hover:text-cream-100"
+                className="btn btn-ghost px-3.5 py-1.5 text-[11px] font-medium"
               >
                 {s.label}
               </a>

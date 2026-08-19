@@ -111,8 +111,8 @@ export default function Leaderboard() {
           are derived from the results, so this re-labels itself the moment
           the 2026 line-up lands in events.js. */}
       <Reveal from="fade">
-        <div className="mb-14 flex flex-col items-center gap-3 text-center">
-          <span className="glass inline-flex items-center gap-2.5 rounded-full px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-cream-200/90">
+        <div className="mb-10 flex flex-col items-center gap-3 text-center">
+          <span className="glass inline-flex items-center gap-2.5 px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-cream-200/90">
             <span
               className="h-1.5 w-1.5 rounded-full"
               style={{
@@ -193,7 +193,7 @@ export default function Leaderboard() {
 
       {/* Full standings — a medal table, each row opening onto the results
           that produced its total. */}
-      <div className="mt-16">
+      <div className="mt-12">
         {/* A visual legend for the columns below. Every figure it labels is
             also named in the row itself for screen readers, so this is hidden
             from them rather than announced as a stray row of letters. */}

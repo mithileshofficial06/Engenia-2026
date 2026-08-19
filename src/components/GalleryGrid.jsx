@@ -58,7 +58,7 @@ export default function GalleryGrid() {
             />
             <span className="absolute inset-0 bg-gradient-to-t from-ink-950/90 via-ink-950/10 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-95" />
 
-            <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-cream-100 opacity-0 backdrop-blur-md transition-all duration-400 group-hover:opacity-100">
+            <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center bg-white/10 text-cream-100 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <Expand size={14} />
             </span>
 
@@ -88,7 +88,7 @@ export default function GalleryGrid() {
               type="button"
               onClick={close}
               aria-label="Close"
-              className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-cream-100 transition hover:bg-white/20"
+              className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center bg-white/10 text-cream-100 transition hover:bg-white/20"
             >
               <X size={18} />
             </button>
@@ -100,7 +100,7 @@ export default function GalleryGrid() {
                 step(-1);
               }}
               aria-label="Previous photo"
-              className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-cream-100 transition hover:bg-white/20 sm:left-6"
+              className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center bg-white/10 text-cream-100 transition hover:bg-white/20 sm:left-6"
             >
               <ChevronLeft size={20} />
             </button>
@@ -112,7 +112,7 @@ export default function GalleryGrid() {
                 step(1);
               }}
               aria-label="Next photo"
-              className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-cream-100 transition hover:bg-white/20 sm:right-6"
+              className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center bg-white/10 text-cream-100 transition hover:bg-white/20 sm:right-6"
             >
               <ChevronRight size={20} />
             </button>
