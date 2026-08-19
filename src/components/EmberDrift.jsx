@@ -64,7 +64,10 @@ export default function EmberDrift() {
     });
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Capped below the display density on purpose: every particle is a soft
+      // 64px sprite with no edge to sharpen, so the extra pixels of a 2x buffer
+      // buy nothing visible and cost ~78% more fill per frame under "lighter".
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = Math.floor(width * dpr);

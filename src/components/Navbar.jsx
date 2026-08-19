@@ -42,7 +42,7 @@ export default function Navbar() {
         <nav
           className={`mx-auto flex max-w-7xl items-center justify-between rounded-2xl px-4 py-2.5 transition-all duration-500 md:px-6 ${
             scrolled
-              ? "glass shadow-[0_18px_60px_-24px_rgba(211,19,62,.5)]"
+              ? "glass glass-blur shadow-[0_18px_60px_-24px_rgba(211,19,62,.5)]"
               : "border border-transparent bg-transparent"
           }`}
         >

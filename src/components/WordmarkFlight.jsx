@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "motion/react";
+import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import geometry from "@/data/wordmark.json";
 
@@ -19,11 +20,17 @@ import geometry from "@/data/wordmark.json";
  * layout, so nothing shifts as the letters leave. Routes with no hero simply
  * have no hero slot, and the letters rest docked.
  *
- * Both slots are measured every frame rather than cached. Caching cost a real
+ * Both slots are measured per frame rather than cached. Caching cost a real
  * bug: the navbar slides down on load, so a rect read during that entrance put
  * the landing point up to 80px too high and the letters docked off-screen.
- * Per-frame reads also survive font loading, route changes and the navbar's
- * own scrolled-state transition, for two getBoundingClientRect calls a frame.
+ * Re-measuring also survives font loading and the navbar's own scrolled-state
+ * transition.
+ *
+ * The loop parks itself once the letters have settled and the slots have
+ * stopped moving, and wakes on scroll, resize, navigation or a late font load.
+ * Free-running it was two forced layouts a frame for the life of the page,
+ * on every route — including the ones with no hero, where the letters just
+ * sit docked and nothing it computed could ever change.
  */
 
 const FlightContext = createContext(null);
@@ -57,14 +64,21 @@ export function WordmarkFlightProvider({ children }) {
   );
 }
 
+// Frames of no measurable change before the loop parks. Long enough to ride
+// out the navbar entrance and its 500ms scrolled-state transition.
+const SETTLE_FRAMES = 60;
+
 function FlyingWordmark({ heroSlot, dockSlot }) {
   const letterEls = useRef([]);
   const progress = useRef(0);
   const sizedFor = useRef(0);
   const [ready, setReady] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     let raf = 0;
+    let idle = 0;
+    let lastBox = "";
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const frame = () => {
@@ -96,6 +110,14 @@ function FlyingWordmark({ heroSlot, dockSlot }) {
             ? target
             : progress.current + (target - progress.current) * SMOOTH;
 
+          // Still only if the letters have caught up *and* neither slot has
+          // moved since the last frame.
+          const box = `${dock.left},${dock.top},${dock.width},${base.left},${base.top},${base.width}`;
+          const settled = Math.abs(target - progress.current) < 0.0005 && box === lastBox;
+          lastBox = box;
+          idle = settled ? idle + 1 : 0;
+          if (settled) progress.current = target;
+
           const p = progress.current;
           const scale = dock.width / base.width;
 
@@ -116,15 +138,34 @@ function FlyingWordmark({ heroSlot, dockSlot }) {
           }
 
           if (!ready) setReady(true);
+
+          if (idle > SETTLE_FRAMES) {
+            raf = 0; // parked — scroll, resize, navigation or fonts wake it
+            return;
+          }
         }
       }
 
       raf = requestAnimationFrame(frame);
     };
 
+    const wake = () => {
+      idle = 0;
+      if (!raf) raf = requestAnimationFrame(frame);
+    };
+
     raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
-  }, [heroSlot, dockSlot, ready]);
+    window.addEventListener("scroll", wake, { passive: true });
+    window.addEventListener("resize", wake);
+    // A font landing late reflows the navbar, and with it the dock slot.
+    document.fonts?.ready.then(wake).catch(() => {});
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", wake);
+      window.removeEventListener("resize", wake);
+    };
+  }, [heroSlot, dockSlot, ready, pathname]);
 
   return (
     <div

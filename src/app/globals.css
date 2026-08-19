@@ -68,9 +68,15 @@
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+/* Opacity only, deliberately. These drive the ambient orbs, which carry a
+   64px blur at up to 52vmax — animating transform on those forces the whole
+   blurred surface to re-rasterise every frame. Opacity stays on the
+   compositor, so the blur rasterises once and is merely faded. The scale it
+   used to carry was invisible under that much blur anyway; the range is
+   widened a touch to keep the same sense of breathing. */
 @keyframes pulse-glow {
-  0%, 100% { opacity: .35; transform: scale(1); }
-  50%      { opacity: .7;  transform: scale(1.08); }
+  0%, 100% { opacity: .32; }
+  50%      { opacity: .72; }
 }
 
 /* ── Ambient orb colours ──────────────────────────────────────────────
@@ -177,11 +183,19 @@ body {
    cream hairline where no accent is set. */
 @utility glass {
   background:
-    linear-gradient(180deg, rgb(255 248 236 / 0.05), rgb(255 248 236 / 0.012)),
-    color-mix(in oklab, var(--color-ink-800) 74%, transparent);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
+    linear-gradient(180deg, rgb(255 248 236 / 0.055), rgb(255 248 236 / 0.014)),
+    color-mix(in oklab, var(--color-ink-800) 82%, transparent);
   border: 1px solid rgb(var(--accent-rgb, 255 248 236) / 0.14);
+}
+
+/* Real backdrop blur, for the few panels that sit over scrolling *content*
+   rather than over the backdrop. Everywhere else it cost a full re-sample and
+   re-blur every frame to blur a background that is already soft gradients on
+   near-black — nothing behind those panels has detail to lose. The panel fill
+   above is opaque enough to separate on its own. */
+@utility glass-blur {
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
 
 /* Canvas weave — the artwork is paint on a surface, so surfaces carry one. */

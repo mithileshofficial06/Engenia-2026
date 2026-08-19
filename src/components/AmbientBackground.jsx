@@ -26,6 +26,8 @@ export default function AmbientBackground() {
     const el = driftRef.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Nothing to lag behind on a touch screen, and the loop is not free.
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
     let raf = 0;
     let tx = 0;
@@ -33,20 +35,29 @@ export default function AmbientBackground() {
     let cx = 0;
     let cy = 0;
 
-    const onMove = (e) => {
-      tx = (e.clientX / window.innerWidth - 0.5) * 40;
-      ty = (e.clientY / window.innerHeight - 0.5) * 40;
-    };
-
+    // The loop parks itself once the orbs have caught up with the cursor.
+    // Left free-running it wrote an identical transform every frame, forever,
+    // to the element that parents five 64px-blurred orbs — enough on its own
+    // to keep that whole subtree awake on a page that is otherwise still.
     const tick = () => {
       cx += (tx - cx) * 0.045;
       cy += (ty - cy) * 0.045;
       el.style.transform = `translate3d(${cx.toFixed(2)}px, ${cy.toFixed(2)}px, 0)`;
+
+      if (Math.abs(tx - cx) < 0.05 && Math.abs(ty - cy) < 0.05) {
+        raf = 0; // settled — next pointermove wakes it back up
+        return;
+      }
       raf = requestAnimationFrame(tick);
     };
 
+    const onMove = (e) => {
+      tx = (e.clientX / window.innerWidth - 0.5) * 40;
+      ty = (e.clientY / window.innerHeight - 0.5) * 40;
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
     window.addEventListener("pointermove", onMove, { passive: true });
-    raf = requestAnimationFrame(tick);
     return () => {
       window.removeEventListener("pointermove", onMove);
       cancelAnimationFrame(raf);
@@ -58,9 +69,19 @@ export default function AmbientBackground() {
     const root = rootRef.current;
     if (!root) return;
 
+    // Guarded on the key: --amb-1..3 are registered <color> properties feeding
+    // five blurred radial gradients, so touching them restarts a 1.4s
+    // transition that repaints and re-blurs all five. pick() runs on every
+    // scroll frame, and re-applying the *same* accent there was repainting the
+    // whole backdrop continuously while you scrolled.
+    let current = null;
     const apply = (key) => {
-      const accent = ACCENTS[key] ?? ACCENTS[DEFAULT_ACCENT];
-      accent.ambient.forEach((colour, i) => root.style.setProperty(`--amb-${i + 1}`, colour));
+      const resolved = key && ACCENTS[key] ? key : DEFAULT_ACCENT;
+      if (resolved === current) return;
+      current = resolved;
+      ACCENTS[resolved].ambient.forEach((colour, i) =>
+        root.style.setProperty(`--amb-${i + 1}`, colour),
+      );
     };
 
     apply(DEFAULT_ACCENT);
