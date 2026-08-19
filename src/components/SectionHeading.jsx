@@ -3,7 +3,14 @@
 import { motion } from "motion/react";
 import BrushRule from "@/components/BrushRule";
 
-export default function SectionHeading({ eyebrow, title, accent, subtitle, align = "center" }) {
+export default function SectionHeading({
+  eyebrow,
+  title,
+  accent,
+  subtitle,
+  index,
+  align = "center",
+}) {
   const alignment = align === "left" ? "items-start text-left" : "items-center text-center";
 
   return (
@@ -20,6 +27,17 @@ export default function SectionHeading({ eyebrow, title, accent, subtitle, align
             className="h-1.5 w-1.5 rounded-full"
             style={{ background: "var(--accent)", boxShadow: "0 0 10px var(--accent)" }}
           />
+          {/* The number is what makes the eyebrow a position rather than just
+              a label — it tells you how far through the page you are, which
+              the accent colour on its own cannot. */}
+          {index != null && (
+            <>
+              <span className="tabular-nums" style={{ color: "var(--accent)" }}>
+                {String(index).padStart(2, "0")}
+              </span>
+              <span className="text-cream-400/30">/</span>
+            </>
+          )}
           {eyebrow}
         </motion.span>
       )}

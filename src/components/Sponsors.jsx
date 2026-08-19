@@ -6,7 +6,7 @@ import Marquee from "@/components/Marquee";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import Flourish from "@/components/Flourish";
-import { sectionAccent } from "@/lib/accents";
+import SectionShell from "@/components/SectionShell";
 
 function Logo({ sponsor, size = "md" }) {
   const box = size === "lg" ? "h-24 w-52 sm:h-32 sm:w-72" : "h-14 w-32 sm:h-16 sm:w-40";
@@ -32,11 +32,12 @@ function Logo({ sponsor, size = "md" }) {
 
 export default function Sponsors() {
   return (
-    <section id="sponsors" {...sectionAccent("gold")} className="relative overflow-hidden py-16 sm:py-24">
+    <SectionShell id="sponsors" hue="gold" className="overflow-hidden py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-8">
         <Flourish className="mx-auto mb-6 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
 
         <SectionHeading
+          index={4}
           eyebrow="With thanks"
           title="Our"
           accent="Sponsors"
@@ -83,6 +84,6 @@ export default function Sponsors() {
           ))}
         </Marquee>
       </div>
-    </section>
+    </SectionShell>
   );
 }

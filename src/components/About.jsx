@@ -8,7 +8,8 @@ import SectionHeading from "@/components/SectionHeading";
 import Flourish from "@/components/Flourish";
 import BrushRule from "@/components/BrushRule";
 import Counter from "@/components/Counter";
-import { ACCENTS, accentVars, sectionAccent } from "@/lib/accents";
+import SectionShell from "@/components/SectionShell";
+import { ACCENTS, accentVars } from "@/lib/accents";
 import { DROPCAP_SRC, MOTIFS } from "@/lib/assets";
 
 export default function About() {
@@ -16,11 +17,12 @@ export default function About() {
   const opensOnE = about.body.startsWith("E");
 
   return (
-    <section id="about" {...sectionAccent("azure")} className="relative px-4 py-16 sm:py-24 md:px-8">
+    <SectionShell id="about" hue="azure" band className="px-4 py-16 sm:py-24 md:px-8">
       <div className="mx-auto max-w-6xl">
         <Flourish className="mx-auto mb-6 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
 
         <SectionHeading
+          index={1}
           eyebrow="Who we are"
           title="About"
           accent="EnGenia"
@@ -128,6 +130,6 @@ export default function About() {
           ))}
         </div>
       </div>
-    </section>
+    </SectionShell>
   );
 }

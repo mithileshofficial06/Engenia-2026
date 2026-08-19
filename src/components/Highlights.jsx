@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { highlights } from "@/data/site";
 import SectionHeading from "@/components/SectionHeading";
 import Flourish from "@/components/Flourish";
-import { sectionAccent } from "@/lib/accents";
+import SectionShell from "@/components/SectionShell";
 
 export default function Highlights() {
   const trackRef = useRef(null);
@@ -54,11 +54,12 @@ export default function Highlights() {
   }, []);
 
   return (
-    <section id="highlights" {...sectionAccent("crimson")} className="relative py-16 sm:py-24">
+    <SectionShell id="highlights" hue="crimson" band className="py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-8">
         <Flourish className="mx-auto mb-6 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
 
         <SectionHeading
+          index={3}
           eyebrow="Look back"
           title="Cultural"
           accent="Highlights"
@@ -144,6 +145,6 @@ export default function Highlights() {
           </div>
         </div>
       </div>
-    </section>
+    </SectionShell>
   );
 }

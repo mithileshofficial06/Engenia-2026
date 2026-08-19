@@ -8,7 +8,7 @@ import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import Flourish from "@/components/Flourish";
 import BrushRule from "@/components/BrushRule";
-import { sectionAccent } from "@/lib/accents";
+import SectionShell from "@/components/SectionShell";
 
 // Cord lengths. Kept gentle — enough that the row is not mechanical, small
 // enough that the name plates below still read as a line.
@@ -28,11 +28,12 @@ export default function Departments() {
   const still = useReducedMotion();
 
   return (
-    <section id="departments" {...sectionAccent("jade")} className="relative px-4 py-16 sm:py-24 md:px-8">
+    <SectionShell id="departments" hue="jade" className="px-4 py-16 sm:py-24 md:px-8">
       <div className="mx-auto max-w-6xl">
         <Flourish className="mx-auto mb-6 h-5 w-full max-w-md text-[var(--accent)] opacity-55" />
 
         <SectionHeading
+          index={2}
           eyebrow="The contenders"
           title="Participating"
           accent="Departments"
@@ -185,6 +186,6 @@ export default function Departments() {
           </Link>
         </Reveal>
       </div>
-    </section>
+    </SectionShell>
   );
 }
