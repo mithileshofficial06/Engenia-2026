@@ -63,9 +63,9 @@ export default function Hero() {
             initial={{ opacity: 0, y: 26 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            className="font-display mt-4 text-balance text-center text-3xl font-bold leading-[1.08] tracking-tight sm:text-5xl md:text-6xl"
+            className="text-fest font-display mt-4 text-balance text-center text-3xl font-bold leading-[1.08] tracking-tight sm:text-5xl md:text-6xl"
           >
-            Experience the <span className="text-fest">Extravaganza</span>
+            Experience the Extravaganza
           </motion.h1>
 
           <motion.div

@@ -1,4 +1,4 @@
-import { Outfit, Playfair_Display } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
 import { festival } from "@/data/site";
 import { FAVICON_SRC, OG_SRC } from "@/lib/assets";
@@ -8,16 +8,22 @@ import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ScrollProgress";
 import { WordmarkFlightProvider } from "@/components/WordmarkFlight";
 
-const outfit = Outfit({
+/* Display. A soft old-style serif with real character in the letterforms —
+   chosen because the wordmark is hand-painted, and a neutral grotesque next
+   to it just looks like the artwork and the site were made by two people who
+   never spoke. Variable, so headings and the flip clock both get the weight
+   they need from one file. */
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-outfit",
+  variable: "--font-fraunces",
   display: "swap",
 });
 
-const playfair = Playfair_Display({
+/* Everything else. Quiet, wide apertures, and proper tabular figures, which
+   the leaderboard and the counter both lean on. */
+const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["600", "700", "800", "900"],
-  variable: "--font-playfair",
+  variable: "--font-manrope",
   display: "swap",
 });
 
@@ -46,7 +52,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${playfair.variable}`}>
+    <html lang="en" className={`${fraunces.variable} ${manrope.variable}`}>
       <body className="font-sans antialiased">
         <AmbientBackground />
         <ScrollProgress />

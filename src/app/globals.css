@@ -44,13 +44,12 @@
   --color-jade-500: #05bbae;
   --color-jade-600: #069568;
 
-  --font-display: var(--font-playfair), "Playfair Display", Georgia, serif;
-  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), "Fraunces", Georgia, serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 
   --animate-marquee: marquee 42s linear infinite;
   --animate-marquee-slow: marquee 70s linear infinite;
   --animate-float: float 7s ease-in-out infinite;
-  --animate-shimmer: shimmer 6s linear infinite;
   --animate-pulse-glow: pulse-glow 4s ease-in-out infinite;
   --animate-spin-slow: spin 22s linear infinite;
 }
@@ -62,11 +61,6 @@
 @keyframes float {
   0%, 100% { transform: translateY(0) }
   50%      { transform: translateY(-14px) }
-}
-@keyframes shimmer {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 }
 /* Opacity only, deliberately. These drive the ambient orbs, which carry a
    64px blur at up to 52vmax — animating transform on those forces the whole
@@ -158,14 +152,22 @@ body {
 
 /* ── Utilities ────────────────────────────────────────────────────── */
 
-/* Display type: the whole logo spread, slowly drifting. */
+/* Headings, painted in the logo spread.
+   Clipped to the glyphs, so a heading carries the same left-to-right hue arc
+   the artwork runs: ember, crimson, azure, jade, gold.
+
+   Static. This used to drift its background-position on a 9s loop, which
+   repaints the whole text run every frame — affordable on the one word it was
+   applied to, wasteful now that every page and section heading uses it.
+
+   Restricted to large headings by convention, not by CSS: azure sits at
+   4.5:1 on the page ground and the crimson stop at 3.9:1, which clears AA for
+   large text but not for body copy. Card titles and labels stay cream. */
 @utility text-fest {
   background-image: var(--grad-arc);
-  background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: shimmer 9s ease-in-out infinite;
 }
 
 /* Solid fills, buttons, bars. */

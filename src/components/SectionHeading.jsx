@@ -29,12 +29,15 @@ export default function SectionHeading({ eyebrow, title, accent, subtitle, align
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="font-display text-balance text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl"
+        className="text-fest font-display text-balance text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl"
       >
         {title}{" "}
         {accent && (
           <span className="relative inline-block">
-            <span style={{ color: "var(--accent)" }}>{accent}</span>
+            {/* Inherits the transparent fill, so the heading gradient paints
+                straight through this word. The section hue still shows, in
+                the swash underneath. */}
+            <span>{accent}</span>
             {/* Painted swash under the accent word, in the section's hue. */}
             <motion.span
               initial={{ scaleX: 0, opacity: 0 }}

@@ -28,9 +28,12 @@ export default function PageHeader({ eyebrow, title, accent, subtitle, hue = "em
           initial={{ opacity: 0, y: 26 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.75, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
-          className="font-display mt-5 text-balance text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl md:text-7xl"
+          className="text-fest font-display mt-5 text-balance text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl md:text-7xl"
         >
-          {title} {accent && <span style={{ color: "var(--accent)" }}>{accent}</span>}
+          {/* The accent word no longer takes the section hue on its own: the
+              whole heading is painted in the logo arc, and a solid colour
+              inside it would punch a flat hole through the spread. */}
+          {title} {accent}
         </motion.h1>
 
         {subtitle && (
