@@ -65,14 +65,16 @@ export const about = {
   ],
 };
 
+// Roster only — no points. Standings are summed from the event results in
+// events.js by lib/standings.js, so there is one source of truth for a score.
 export const departments = [
-  { code: "IT", name: "Information Technology", points: 420, accent: "#ffc554" },
-  { code: "CSE-B", name: "Computer Science & Engineering — Section B", points: 330, accent: "#f47115" },
-  { code: "CSE-A", name: "Computer Science & Engineering — Section A", points: 265, accent: "#d3133e" },
-  { code: "ECE", name: "Electronics & Communication Engineering", points: 220, accent: "#077faf" },
-  { code: "MECH", name: "Mechanical Engineering", points: 190, accent: "#05bbae" },
-  { code: "EEE", name: "Electrical & Electronics Engineering", points: 160, accent: "#d41350" },
-  { code: "AIDS", name: "Artificial Intelligence & Data Science", points: 35, accent: "#069568" },
+  { code: "IT", name: "Information Technology", accent: "#ffc554" },
+  { code: "CSE-B", name: "Computer Science & Engineering — Section B", accent: "#f47115" },
+  { code: "CSE-A", name: "Computer Science & Engineering — Section A", accent: "#d3133e" },
+  { code: "ECE", name: "Electronics & Communication Engineering", accent: "#077faf" },
+  { code: "MECH", name: "Mechanical Engineering", accent: "#05bbae" },
+  { code: "EEE", name: "Electrical & Electronics Engineering", accent: "#d41350" },
+  { code: "AIDS", name: "Artificial Intelligence & Data Science", accent: "#069568" },
 ];
 
 export const highlights = [
