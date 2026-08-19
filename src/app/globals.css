@@ -381,3 +381,60 @@ body {
   from { transform: rotateX(90deg); }
   to   { transform: rotateX(0deg); }
 }
+
+/* ── Opening curtain ──────────────────────────────────────────────────
+   The site opens pitch black, the wordmark reveals against it, then the
+   black lifts.
+
+   Deliberately pure CSS rather than a motion component. A JS-driven curtain
+   that fails to hydrate leaves the site permanently black — the one failure
+   mode a full-screen overlay must not have. This runs off the server-rendered
+   markup, so it clears whether or not React ever wakes up.
+
+   The hold is 72% of 2.9s, which lands at 2.09s: the moment the last letter
+   of the wordmark finishes dropping in. `visibility` at the final keyframe is
+   what stops the spent curtain from swallowing clicks.
+
+   The reduced-motion rule further down collapses the duration to nothing, so
+   those users get the site immediately rather than a black screen. */
+@keyframes curtain-lift {
+  0%,
+  72% {
+    opacity: 1;
+    visibility: visible;
+  }
+  99.9% {
+    opacity: 0;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.intro-curtain {
+  animation: curtain-lift 2.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Half of the logo arc, for a headline split into two pieces that move.
+
+   background-clip: text cannot survive a transformed descendant: the clip is
+   taken against the box of the element carrying the background, so a half
+   that slides out of that box simply stops painting, and whatever is left
+   samples the wrong part of the gradient. Putting text-fest on the h1 and
+   translating the halves inside it rendered the headline as a flat orange
+   fragment the moment it moved.
+
+   So each half carries its own gradient instead, sized to twice its width and
+   anchored to opposite ends. Position 0% shows the first half of the arc and
+   100% the second, so the two meet exactly at the arc's midpoint and read as
+   one continuous sweep across the headline — while each half is free to move
+   independently, because it is clipping against itself. */
+@utility text-fest-split {
+  background-image: var(--grad-arc);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

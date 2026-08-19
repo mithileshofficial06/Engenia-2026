@@ -170,7 +170,7 @@ function FlyingWordmark({ heroSlot, dockSlot }) {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-[61] overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-[78] overflow-hidden"
       style={{ opacity: ready ? 1 : 0, transition: "opacity .3s ease" }}
     >
       {geometry.letters.map((letter, i) => (

@@ -3,6 +3,7 @@ import "./globals.css";
 import { festival } from "@/data/site";
 import { FAVICON_SRC, OG_SRC } from "@/lib/assets";
 import AmbientBackground from "@/components/AmbientBackground";
+import IntroCurtain from "@/components/IntroCurtain";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -54,6 +55,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${fraunces.variable} ${manrope.variable}`}>
       <body className="font-sans antialiased">
+        <IntroCurtain />
         <AmbientBackground />
         <ScrollProgress />
         <WordmarkFlightProvider>
