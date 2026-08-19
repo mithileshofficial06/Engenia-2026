@@ -1,0 +1,65 @@
+{
+  "aspect": 1.8437,
+  "version": "643e6d4e",
+  "logo": "/logo.643e6d4e.png",
+  "og": "/og.643e6d4e.png",
+  "favicon": "/favicon.643e6d4e.png",
+  "dropcap": "/dropcap.643e6d4e.png",
+  "motifs": {
+    "moonwalker": "/motifs/moonwalker.643e6d4e.png",
+    "mask": "/motifs/mask.643e6d4e.png",
+    "guitar": "/motifs/guitar.643e6d4e.png",
+    "ballerina": "/motifs/ballerina.643e6d4e.png"
+  },
+  "letters": [
+    {
+      "glyph": "E",
+      "src": "/wordmark/L1.643e6d4e.png",
+      "from": "top",
+      "left": 0,
+      "width": 22.32
+    },
+    {
+      "glyph": "n",
+      "src": "/wordmark/L2.643e6d4e.png",
+      "from": "bottom",
+      "left": 22.32,
+      "width": 12.4
+    },
+    {
+      "glyph": "g",
+      "src": "/wordmark/L3.643e6d4e.png",
+      "from": "top",
+      "left": 34.72,
+      "width": 14.4
+    },
+    {
+      "glyph": "e",
+      "src": "/wordmark/L4.643e6d4e.png",
+      "from": "bottom",
+      "left": 49.12,
+      "width": 12.4
+    },
+    {
+      "glyph": "n",
+      "src": "/wordmark/L5.643e6d4e.png",
+      "from": "top",
+      "left": 61.52,
+      "width": 10
+    },
+    {
+      "glyph": "i",
+      "src": "/wordmark/L6.643e6d4e.png",
+      "from": "bottom",
+      "left": 71.52,
+      "width": 10.8
+    },
+    {
+      "glyph": "a",
+      "src": "/wordmark/L7.643e6d4e.png",
+      "from": "top",
+      "left": 82.32,
+      "width": 17.68
+    }
+  ]
+}

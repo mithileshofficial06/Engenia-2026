@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Palette sampled from the ENGENIA 2026 logo ───────────────────────
+     The artwork paints each letter a different colour, so the site runs on
+     that same spread: warm ember and gold at the ends, azure and jade
+     through the middle, crimson between them, all on near-black with an
+     ivory-cream rather than pure white for text.                          */
+
+  --color-ink-950: #070403;
+  --color-ink-900: #0d0806;
+  --color-ink-800: #16100c;
+  --color-ink-700: #211913;
+
+  /* Cream — the ivory brushwork (the n, the guitar, the figures) */
+  --color-cream-100: #fff8ec;
+  --color-cream-200: #ffefd3;
+  --color-cream-300: #e8d8bb;
+  --color-cream-400: #b8a888;
+
+  /* Gold — the a, and the 2026 */
+  --color-gold-400: #ffc554;
+  --color-gold-500: #eb9512;
+  --color-gold-600: #c67a08;
+
+  /* Ember — the opening E */
+  --color-ember-400: #ff9440;
+  --color-ember-500: #f47115;
+  --color-ember-600: #e44217;
+
+  /* Crimson — the e, and the rose flourishes */
+  --color-crimson-400: #f5335f;
+  --color-crimson-500: #d3133e;
+  --color-crimson-600: #ab0e31;
+  --color-crimson-700: #d41350;
+
+  /* Azure — the g */
+  --color-azure-400: #29a6d6;
+  --color-azure-500: #077faf;
+  --color-azure-600: #056188;
+
+  /* Jade — the second n */
+  --color-jade-400: #2fd6c9;
+  --color-jade-500: #05bbae;
+  --color-jade-600: #069568;
+
+  --font-display: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-marquee: marquee 42s linear infinite;
+  --animate-marquee-slow: marquee 70s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-shimmer: shimmer 6s linear infinite;
+  --animate-pulse-glow: pulse-glow 4s ease-in-out infinite;
+  --animate-spin-slow: spin 22s linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) }
+  50%      { transform: translateY(-14px) }
+}
+@keyframes shimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: .35; transform: scale(1); }
+  50%      { opacity: .7;  transform: scale(1.08); }
+}
+
+/* ── Ambient orb colours ──────────────────────────────────────────────
+   Registered as real <color> properties rather than plain custom properties.
+   That is the whole trick behind the section-reactive background: an
+   unregistered var would snap between hues, because background-image itself
+   is not animatable. Registered, the colour interpolates and the gradient
+   simply re-renders each frame.                                          */
+@property --amb-1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgb(244 113 21 / 0.3);
+}
+@property --amb-2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgb(235 149 18 / 0.26);
+}
+@property --amb-3 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgb(211 19 62 / 0.22);
+}
+
+.ambient {
+  transition:
+    --amb-1 1.4s ease,
+    --amb-2 1.4s ease,
+    --amb-3 1.4s ease;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+
+  /* The full hue arc of the wordmark, left to right. Used for display type
+     and hairlines, where the whole spread can read at once. */
+  --grad-arc: linear-gradient(
+    100deg,
+    #f47115 0%,
+    #d41350 26%,
+    #077faf 52%,
+    #05bbae 74%,
+    #eb9512 100%
+  );
+
+  /* The warm end on its own. Solid fills and buttons use this — the full arc
+     is too busy behind text and drops contrast through the blues. */
+  --grad-fest: linear-gradient(100deg, #eb9512 0%, #f47115 48%, #d3133e 100%);
+}
+
+* { -webkit-tap-highlight-color: transparent; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+body {
+  background: var(--color-ink-950);
+  color: #f5ecdd;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-crimson-500);
+  color: var(--color-cream-100);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0d0806; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-gold-500), var(--color-ember-500), var(--color-crimson-500));
+  border-radius: 99px;
+  border: 2px solid #0d0806;
+}
+
+/* ── Utilities ────────────────────────────────────────────────────── */
+
+/* Display type: the whole logo spread, slowly drifting. */
+@utility text-fest {
+  background-image: var(--grad-arc);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 9s ease-in-out infinite;
+}
+
+/* Solid fills, buttons, bars. */
+@utility bg-fest {
+  background-image: var(--grad-fest);
+}
+
+/* Hairlines and rules that can carry the full spread. */
+@utility bg-arc {
+  background-image: var(--grad-arc);
+}
+
+/* Painted panel rather than cold glass: a warm wash top-to-bottom over near
+   black, edged in the section's accent at low strength. Falls back to a plain
+   cream hairline where no accent is set. */
+@utility glass {
+  background:
+    linear-gradient(180deg, rgb(255 248 236 / 0.05), rgb(255 248 236 / 0.012)),
+    color-mix(in oklab, var(--color-ink-800) 74%, transparent);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgb(var(--accent-rgb, 255 248 236) / 0.14);
+}
+
+/* Canvas weave — the artwork is paint on a surface, so surfaces carry one. */
+@utility canvas {
+  position: relative;
+}
+@utility canvas-tex {
+  background-image:
+    repeating-linear-gradient(90deg, rgb(255 248 236 / 0.014) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgb(255 248 236 / 0.014) 0 1px, transparent 1px 3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
