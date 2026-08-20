@@ -115,7 +115,7 @@ export default function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.28 }}
-            className="fixed inset-0 z-[55] bg-ink-950/95 backdrop-blur-xl md:hidden"
+            className="fixed inset-0 z-[55] bg-ink-950/97 md:hidden"
           >
             <div className="flex h-full flex-col items-center justify-center gap-2 px-8">
               {navLinks.map((link, i) => (

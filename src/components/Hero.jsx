@@ -47,7 +47,7 @@ export default function Hero() {
           reads through the letters instead of sitting behind a box. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[42%] h-[62vmin] w-[118vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(244,113,21,.20),rgba(211,19,62,.13)_46%,transparent_72%)] blur-2xl"
+        className="pointer-events-none absolute left-1/2 top-[42%] h-[62vmin] w-[118vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(244,113,21,.20),rgba(211,19,62,.13)_46%,transparent_76%)]"
       />
 
       <div className="relative z-10 flex w-full flex-col items-center">

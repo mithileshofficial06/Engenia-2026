@@ -44,7 +44,7 @@
   --color-jade-500: #05bbae;
   --color-jade-600: #069568;
 
-  --font-display: var(--font-fraunces), "Fraunces", Georgia, serif;
+  --font-display: var(--font-syne), "Syne", "Trebuchet MS", ui-sans-serif, sans-serif;
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 
   --animate-marquee: marquee 42s linear infinite;
@@ -249,8 +249,13 @@ body {
    near-black — nothing behind those panels has detail to lose. The panel fill
    above is opaque enough to separate on its own. */
 @utility glass-blur {
-  backdrop-filter: blur(14px) saturate(150%);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  /* The saturate() is gone. A backdrop-filter is already re-sampling whatever
+     is behind the panel on every frame that anything back there moves, and on
+     this page the embers guarantee that is every frame; stacking a second
+     filter function on top doubled that pass to boost the saturation of soft
+     gradients on near-black, which have almost no saturation to boost. */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Canvas weave — the artwork is paint on a surface, so surfaces carry one. */
@@ -437,4 +442,154 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* ── Entrance engine ───────────────────────────────────────────────────
+   All of this is CSS animation driven by a single class an IntersectionObserver
+   drops on a container: `rise-in`. That matters for more than tidiness.
+
+   These entrances used to be per-element Framer Motion components — a heading,
+   its eyebrow and its subtitle were three motion nodes, each with its own
+   viewport observer and its own JS-driven frame loop, and a letter-by-letter
+   heading would have multiplied that by twenty. Keyframes hand the whole thing
+   to the compositor: one observer per block, zero JS per frame, and the
+   reduced-motion rule above collapses every one of them for free.
+
+   The initial state lives on the base class rather than in the animation, so
+   an element is hidden from first paint and never flashes before its turn. */
+
+/* Rise: the plain one, for eyebrows, subtitles and name plates. */
+.rise-up {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.rise-in .rise-up {
+  animation: rise-up 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+@keyframes rise-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Letter-by-letter headings ────────────────────────────────────────
+   Each word is a clipping box and each letter inside it starts pushed below
+   that box, so the line does not fade in — it rises through its own baseline,
+   one glyph after the next.
+
+   The padding/negative-margin pair on the word is what makes the clip usable:
+   with a heading leading of 1.05 the line box is shorter than the glyphs, so a
+   bare `overflow: hidden` would shave the tops off ascenders and the tails off
+   descenders. The padding opens the box, the negative margin gives the space
+   straight back to the layout, and the letters travel 125% — past the bottom
+   padding edge — so nothing peeks out before it is due. */
+.split {
+  position: relative;
+}
+.split-word {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.2em 0.04em 0.18em;
+  margin: -0.2em -0.04em -0.18em;
+}
+.split-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(125%);
+}
+.rise-in .split-char {
+  animation: split-rise 0.68s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--rise-delay, 0ms) + var(--i, 0) * 26ms);
+}
+@keyframes split-rise {
+  0%   { opacity: 0; transform: translateY(125%); }
+  22%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* The heading gradient, per glyph.
+   `background-clip: text` clips against the box of the element carrying the
+   background, so the moment a letter moves inside the heading it stops
+   sampling the heading's gradient and starts sampling its own — twenty letters
+   each painted the entire arc. Every letter therefore carries its own copy of
+   the gradient, sized to the whole heading and offset by that letter's
+   position within it (SplitHeading measures and writes those two values). The
+   result is pixel-identical to one gradient across the line, while each glyph
+   is free to move on its own. */
+.split-fest .split-char {
+  background-image: var(--grad-arc);
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* The painted swash under the accent word, timed to arrive once the letters
+   above it have landed. */
+.split-swash {
+  display: block;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.rise-in .split-swash {
+  animation: swash-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--swash-delay, 400ms);
+}
+@keyframes swash-in {
+  from { opacity: 0; transform: scaleX(0); }
+  to   { opacity: 0.75; transform: scaleX(1); }
+}
+
+/* ── Banners dropping off the rail ────────────────────────────────────
+   A pennant hung on a cord does not fade in, it falls and then swings itself
+   still. So: the first 38% is the fall, easing *into* speed the way gravity
+   does rather than out of it, and the remaining ~0.5s is a pendulum losing
+   about 55% of its amplitude on each pass until it settles square.
+
+   Rotation is about the top edge, where the cord meets the cloth, which is the
+   only pivot that reads as hanging rather than as spinning.
+
+   Each keyframe restates its own timing function on purpose: without that, the
+   stops after the fall would inherit the animation's easing and the swing
+   would arrive in lurches instead of gliding through each pass. */
+.banner-drop {
+  opacity: 0;
+  transform-origin: 50% 0;
+  transform: translateY(-46px) rotate(-12deg);
+}
+.rise-in .banner-drop {
+  animation: banner-drop 0.88s both;
+  animation-delay: var(--drop-delay, 0ms);
+}
+@keyframes banner-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-46px) rotate(-12deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.85, 0.45);
+  }
+  14% {
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.85, 0.45);
+  }
+  38% {
+    transform: translateY(0) rotate(9.5deg);
+    animation-timing-function: ease-in-out;
+  }
+  57% {
+    transform: translateY(0) rotate(-5.2deg);
+    animation-timing-function: ease-in-out;
+  }
+  73% {
+    transform: translateY(0) rotate(2.6deg);
+    animation-timing-function: ease-in-out;
+  }
+  87% {
+    transform: translateY(0) rotate(-1.1deg);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
 }

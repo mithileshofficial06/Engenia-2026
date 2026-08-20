@@ -1,4 +1,4 @@
-import { Fraunces, Manrope } from "next/font/google";
+import { Syne, Manrope } from "next/font/google";
 import "./globals.css";
 import { festival } from "@/data/site";
 import { FAVICON_SRC, OG_SRC } from "@/lib/assets";
@@ -9,14 +9,15 @@ import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ScrollProgress";
 import { WordmarkFlightProvider } from "@/components/WordmarkFlight";
 
-/* Display. A soft old-style serif with real character in the letterforms —
-   chosen because the wordmark is hand-painted, and a neutral grotesque next
-   to it just looks like the artwork and the site were made by two people who
-   never spoke. Variable, so headings and the flip clock both get the weight
-   they need from one file. */
-const fraunces = Fraunces({
+/* Display. Syne — the face drawn for an arts centre, and it shows: wide
+   counters, angular joins, and an extrabold that reads as a poster rather
+   than as a paragraph. That is the register a cultural fest wants, and it
+   stops the site from looking like a journal set beside a hand-painted
+   wordmark. Variable, so headings, pennant codes and the flip clock all pull
+   the weight they need from one file. */
+const syne = Syne({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-syne",
   display: "swap",
 });
 
@@ -53,7 +54,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${manrope.variable}`}>
+    <html lang="en" className={`${syne.variable} ${manrope.variable}`}>
       <body className="font-sans antialiased">
         <IntroCurtain />
         <AmbientBackground />

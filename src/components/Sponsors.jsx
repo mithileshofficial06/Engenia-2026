@@ -50,7 +50,7 @@ export default function Sponsors() {
             <span className="bg-arc absolute inset-x-0 top-0 h-px" />
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 -top-24 mx-auto h-48 w-48 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-rgb)_/_.3),transparent_65%)] blur-2xl"
+              className="pointer-events-none absolute inset-x-0 -top-24 mx-auto h-48 w-48 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-rgb)_/_.3),transparent_70%)]"
             />
             <span className="bg-fest relative px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.3em] text-ink-950">
               {titleSponsor.label}

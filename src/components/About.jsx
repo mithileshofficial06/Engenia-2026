@@ -99,7 +99,7 @@ export default function About() {
 
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-rgb)_/_.3),transparent_65%)] opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-100"
+                  className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-rgb)_/_.3),transparent_70%)] opacity-0 transition-opacity duration-700 group-hover:opacity-100"
                 />
 
                 <span

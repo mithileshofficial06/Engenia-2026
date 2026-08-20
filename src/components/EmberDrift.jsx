@@ -15,8 +15,15 @@ import { useEffect, useRef } from "react";
 // that turn teal stop reading as fire.
 const SPARK_COLOURS = ["255 197 84", "244 113 21"];
 
-const DENSITY = 1 / 13000; // particles per px² of viewport
-const MAX_PARTICLES = 130;
+// Halved from where this started. Every particle is a soft additive sprite
+// covering up to 32px of radius, so the fill they ask for overlaps heavily and
+// the cost is closer to linear in *area covered* than in count. At the old
+// density a 1440p viewport was compositing 130 of them over the whole screen
+// every frame, under `lighter`, beneath a grain layer that then had to blend
+// the result — which is a lot of GPU for something you are not meant to
+// consciously notice. Sixty reads as the same drift.
+const DENSITY = 1 / 26000; // particles per px² of viewport
+const MAX_PARTICLES = 60;
 
 function makeSprite(rgb) {
   const size = 64;
@@ -67,7 +74,7 @@ export default function EmberDrift() {
       // Capped below the display density on purpose: every particle is a soft
       // 64px sprite with no edge to sharpen, so the extra pixels of a 2x buffer
       // buy nothing visible and cost ~78% more fill per frame under "lighter".
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = Math.floor(width * dpr);

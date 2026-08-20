@@ -6,7 +6,7 @@ import { LOGO_SRC } from "@/lib/assets";
 
 export default function Footer() {
   return (
-    <footer className="relative z-10 mt-10 border-t border-white/[0.07] bg-ink-950/60 backdrop-blur-xl">
+    <footer className="relative z-10 mt-10 border-t border-white/[0.07] bg-ink-950/92">
       <span aria-hidden className="bg-arc absolute inset-x-0 top-0 h-px opacity-70" />
 
       <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 md:grid-cols-[1.4fr_1fr_1fr] md:px-8">

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 import { departments } from "@/data/site";
 import Reveal from "@/components/Reveal";
@@ -9,6 +8,7 @@ import SectionHeading from "@/components/SectionHeading";
 import Flourish from "@/components/Flourish";
 import BrushRule from "@/components/BrushRule";
 import SectionShell from "@/components/SectionShell";
+import useReveal from "@/lib/useReveal";
 
 // Cord lengths. Kept gentle — enough that the row is not mechanical, small
 // enough that the name plates below still read as a line.
@@ -25,7 +25,7 @@ function rgbOf(hex) {
 }
 
 export default function Departments() {
-  const still = useReducedMotion();
+  const [railRef, railState] = useReveal({ amount: 0.15 });
 
   return (
     <SectionShell id="departments" hue="jade" className="px-4 py-16 sm:py-24 md:px-8">
@@ -41,8 +41,16 @@ export default function Departments() {
         />
 
         {/* The hall: a gilded rail with seven banners hung off it. Standings
-            live on the leaderboard — this section is only about who competes. */}
-        <div className="relative mt-16">
+            live on the leaderboard — this section is only about who competes.
+
+            The banners used to sway forever on seven infinite Framer Motion
+            loops, each one rotating a clipped element carrying a drop shadow —
+            seven blurred surfaces re-rasterising every frame for as long as the
+            page was open, whether or not the section was even on screen. They
+            now fall once, swing themselves still over about half a second, and
+            cost nothing after that. The pendulum is `banner-drop` in
+            globals.css. */}
+        <div ref={railRef} className={`relative mt-16 ${railState}`}>
           {/* rail, with a soft glow and tapered ends */}
           <span
             aria-hidden
@@ -58,15 +66,12 @@ export default function Departments() {
             {departments.map((dept, i) => {
               const rgb = rgbOf(dept.accent);
               const drop = DROP[i % DROP.length];
+              // Banners come off the rail left to right, close enough together
+              // that the row reads as one gesture rather than as seven.
+              const delay = i * 80;
 
               return (
-                <Reveal
-                  key={dept.code}
-                  as="li"
-                  from="down"
-                  delay={0.05 * i}
-                  className="flex flex-col items-center"
-                >
+                <li key={dept.code} className="group flex flex-col items-center">
                   {/* ring on the rail */}
                   <span
                     aria-hidden
@@ -83,16 +88,11 @@ export default function Departments() {
                     }}
                   />
 
-                  <motion.div
-                    className="w-full origin-top"
-                    animate={still ? undefined : { rotate: [-0.9, 0.9, -0.9] }}
-                    transition={
-                      still
-                        ? undefined
-                        : { duration: 5.5 + i * 0.45, repeat: Infinity, ease: "easeInOut" }
-                    }
-                  >
-                    <div className="group flex flex-col items-center">
+                  {/* The falling element. Pivots on its top edge, where the cord
+                      meets the cloth — any other origin reads as a spin rather
+                      than as something hanging. */}
+                  <div className="banner-drop w-full" style={{ "--drop-delay": `${delay}ms` }}>
+                    <div className="flex flex-col items-center">
                       <div className="relative w-full transition-transform duration-500 group-hover:-translate-y-1">
                         <div
                           className="relative flex flex-col items-center justify-center gap-2 px-2 py-5"
@@ -103,7 +103,10 @@ export default function Departments() {
                             // into ink at the hem. Deep enough that ivory type
                             // reads cleanly on every one of the seven.
                             background: `linear-gradient(180deg, rgb(${rgb} / .95), rgb(${rgb} / .68) 46%, rgb(${rgb} / .34) 78%, rgb(${rgb} / .22)), #0d0907`,
-                            filter: `drop-shadow(0 16px 20px rgb(0 0 0 / .55))`,
+                            // Shaped shadow, so it follows the V-notch. Kept
+                            // tight: this is the one surface that has to be
+                            // re-rasterised while the banner swings.
+                            filter: `drop-shadow(0 12px 14px rgb(0 0 0 / .5))`,
                           }}
                         >
                           {/* woven folds + a broad highlight down the left third */}
@@ -160,13 +163,19 @@ export default function Departments() {
                           style={{ background: GOLD, boxShadow: `0 0 10px rgb(${rgbOf(GOLD)} / .7)` }}
                         />
                       </div>
-
-                      <p className="mt-6 text-balance text-center text-[11px] leading-snug text-cream-300/60 transition-colors duration-500 group-hover:text-cream-100">
-                        {dept.name}
-                      </p>
                     </div>
-                  </motion.div>
-                </Reveal>
+                  </div>
+
+                  {/* The name plate stays out of the swing. A caption that swung
+                      with its banner would be unreadable, and it belongs to the
+                      row rather than to the cloth. */}
+                  <p
+                    style={{ "--rise-delay": `${delay + 420}ms` }}
+                    className="rise-up mt-6 text-balance text-center text-[11px] leading-snug text-cream-300/60 transition-colors duration-500 group-hover:text-cream-100"
+                  >
+                    {dept.name}
+                  </p>
+                </li>
               );
             })}
           </ul>

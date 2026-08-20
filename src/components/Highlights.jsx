@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { highlights } from "@/data/site";
@@ -109,11 +109,39 @@ export default function Highlights() {
     setCycle((c) => c + 1);
   }, []);
 
-  // Autoplay. Restarts whenever the user navigates by hand.
+  // Autoplay, but only while the deck is actually on screen.
+  //
+  // This is the single most expensive thing the home page was doing. The deck
+  // is five 960px photographs stacked on one another, and a tick animates
+  // x/y/rotate/scale/opacity across all five at once, each with a large blurred
+  // box shadow — so every five seconds the browser spent most of a second
+  // repainting the lot. It did that from the moment the page loaded, forever,
+  // including while you were reading the hero three screens above it and while
+  // the section was nowhere near the viewport. The observer keeps the interval
+  // idle until the deck is visible and stops it again when it leaves.
+  const deckRef = useRef(null);
+  const [live, setLive] = useState(false);
+
   useEffect(() => {
+    const el = deckRef.current;
+    if (!el) return undefined;
+    if (typeof IntersectionObserver === "undefined") {
+      setLive(true);
+      return undefined;
+    }
+    const io = new IntersectionObserver(([entry]) => setLive(entry.isIntersecting), {
+      threshold: 0.2,
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Restarts whenever the user navigates by hand, or the deck comes back.
+  useEffect(() => {
+    if (!live) return undefined;
     const id = setInterval(next, AUTOPLAY_MS);
     return () => clearInterval(id);
-  }, [next, cycle]);
+  }, [next, cycle, live]);
 
   useEffect(() => {
     if (flying == null) return undefined;
@@ -158,7 +186,7 @@ export default function Highlights() {
             {/* The aspect box reserves the deck height and fixes the card
                 footprint. Cards sit absolutely inside it and translate up out
                 of it, which the margin above the deck accounts for. */}
-            <div className="relative aspect-[4/3] sm:aspect-[16/10]">
+            <div ref={deckRef} className="relative aspect-[4/3] sm:aspect-[16/10]">
               {highlights.map((item, i) => {
                 const slot = order.indexOf(i);
                 const depth = DEPTH[slot] ?? PARKED;

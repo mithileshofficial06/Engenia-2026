@@ -72,6 +72,7 @@ function FlyingWordmark({ heroSlot, dockSlot }) {
   const letterEls = useRef([]);
   const progress = useRef(0);
   const sizedFor = useRef(0);
+  const readyRef = useRef(false);
   const [ready, setReady] = useState(false);
   const pathname = usePathname();
 
@@ -80,6 +81,12 @@ function FlyingWordmark({ heroSlot, dockSlot }) {
     let idle = 0;
     let lastBox = "";
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Routes with no hero have nothing to fly: the letters sit docked, the
+    // progress target is pinned at 1, and every one of those measurements
+    // resolves to the same numbers it did last frame. Waking the loop on their
+    // scroll bought two forced layouts a frame to compute a value that cannot
+    // move.
+    const flies = Boolean(heroSlot.current);
 
     const frame = () => {
       const dockEl = dockSlot.current;
@@ -137,7 +144,13 @@ function FlyingWordmark({ heroSlot, dockSlot }) {
             el.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${s.toFixed(4)})`;
           }
 
-          if (!ready) setReady(true);
+          // Held in a ref as well as in state: reading the state here would
+          // have to be a dependency of this effect, and flipping it would then
+          // tear down and rebuild the whole loop on the first frame.
+          if (!readyRef.current) {
+            readyRef.current = true;
+            setReady(true);
+          }
 
           if (idle > SETTLE_FRAMES) {
             raf = 0; // parked — scroll, resize, navigation or fonts wake it
@@ -155,7 +168,7 @@ function FlyingWordmark({ heroSlot, dockSlot }) {
     };
 
     raf = requestAnimationFrame(frame);
-    window.addEventListener("scroll", wake, { passive: true });
+    if (flies) window.addEventListener("scroll", wake, { passive: true });
     window.addEventListener("resize", wake);
     // A font landing late reflows the navbar, and with it the dock slot.
     document.fonts?.ready.then(wake).catch(() => {});
@@ -165,7 +178,7 @@ function FlyingWordmark({ heroSlot, dockSlot }) {
       window.removeEventListener("scroll", wake);
       window.removeEventListener("resize", wake);
     };
-  }, [heroSlot, dockSlot, ready, pathname]);
+  }, [heroSlot, dockSlot, pathname]);
 
   return (
     <div

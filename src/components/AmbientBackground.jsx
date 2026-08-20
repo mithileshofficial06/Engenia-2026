@@ -10,7 +10,7 @@ import EmberDrift from "@/components/EmberDrift";
  *
  * Three things layer here: drifting colour orbs that take their hue from
  * whichever section you are currently reading, a drift of embers over the top,
- * and the static surface treatment — grid, canvas weave, grain, vignette.
+ * and the static surface treatment — grid, grain, vignette.
  *
  * The orbs are lit through `--amb-1..3`, which are registered as real colour
  * properties in globals.css. That registration is what lets them transition;
@@ -37,7 +37,7 @@ export default function AmbientBackground() {
 
     // The loop parks itself once the orbs have caught up with the cursor.
     // Left free-running it wrote an identical transform every frame, forever,
-    // to the element that parents five 64px-blurred orbs — enough on its own
+    // to the element that parents four full-screen-scale orbs — enough on its own
     // to keep that whole subtree awake on a page that is otherwise still.
     const tick = () => {
       cx += (tx - cx) * 0.045;
@@ -70,10 +70,10 @@ export default function AmbientBackground() {
     if (!root) return;
 
     // Guarded on the key: --amb-1..3 are registered <color> properties feeding
-    // five blurred radial gradients, so touching them restarts a 1.4s
-    // transition that repaints and re-blurs all five. pick() runs on every
-    // scroll frame, and re-applying the *same* accent there was repainting the
-    // whole backdrop continuously while you scrolled.
+    // four viewport-scale radial gradients, so touching them restarts a 1.4s
+    // transition that repaints all four. pick() is sampled off the scroll, and
+    // re-applying the *same* accent there was repainting the whole backdrop
+    // continuously while you scrolled.
     let current = null;
     const apply = (key) => {
       const resolved = key && ACCENTS[key] ? key : DEFAULT_ACCENT;
@@ -121,19 +121,29 @@ export default function AmbientBackground() {
     document.querySelectorAll("[data-accent]").forEach((el) => io.observe(el));
     pick();
 
+    // Sampled rather than run per frame. pick() reads a bounding rect for
+    // every section currently on screen, which forces a layout, and it was
+    // doing that on every single scroll frame alongside the wordmark's own two
+    // reads. Nothing it decides can change faster than a section can cross the
+    // middle of the viewport, so six times a second is plenty and the hue
+    // still turns over exactly where it used to.
     let queued = 0;
+    let lastRun = 0;
+    const SAMPLE_MS = 160;
     const onScroll = () => {
       if (queued) return;
-      queued = requestAnimationFrame(() => {
+      const wait = Math.max(0, SAMPLE_MS - (performance.now() - lastRun));
+      queued = window.setTimeout(() => {
         queued = 0;
+        lastRun = performance.now();
         pick();
-      });
+      }, wait);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       io.disconnect();
-      cancelAnimationFrame(queued);
+      clearTimeout(queued);
       window.removeEventListener("scroll", onScroll);
     };
   }, [pathname]);
@@ -144,23 +154,27 @@ export default function AmbientBackground() {
       aria-hidden
       className="ambient pointer-events-none fixed inset-0 z-0 overflow-hidden bg-ink-950"
     >
-      <div ref={driftRef} className="absolute inset-[-15%] will-change-transform">
-        <div className="animate-pulse-glow absolute left-[8%] top-[6%] h-[46vmax] w-[46vmax] rounded-full bg-[radial-gradient(circle,var(--amb-1),transparent_62%)] blur-3xl" />
+      {/* Four orbs, unblurred.
+          There were five, and each carried `blur-3xl` — a 64px Gaussian over
+          surfaces up to 52vmax across, re-rasterised whenever anything under
+          them moved, which on this page is constantly. A radial gradient that
+          fades to transparent well inside its own radius is already a soft
+          edge; the filter was spending the largest paint budget on the page to
+          smooth something with nothing left to smooth. The stops are pulled in
+          instead, which costs one gradient and reads the same. */}
+      <div ref={driftRef} className="absolute inset-[-15%]">
+        <div className="animate-pulse-glow absolute left-[8%] top-[6%] h-[46vmax] w-[46vmax] rounded-full bg-[radial-gradient(circle,var(--amb-1),transparent_66%)]" />
         <div
-          className="animate-pulse-glow absolute right-[2%] top-[22%] h-[52vmax] w-[52vmax] rounded-full bg-[radial-gradient(circle,var(--amb-2),transparent_62%)] blur-3xl"
+          className="animate-pulse-glow absolute right-[2%] top-[22%] h-[52vmax] w-[52vmax] rounded-full bg-[radial-gradient(circle,var(--amb-2),transparent_66%)]"
           style={{ animationDelay: "1.4s" }}
         />
         <div
-          className="animate-pulse-glow absolute bottom-[-12%] left-[26%] h-[48vmax] w-[48vmax] rounded-full bg-[radial-gradient(circle,var(--amb-3),transparent_60%)] blur-3xl"
+          className="animate-pulse-glow absolute bottom-[-12%] left-[26%] h-[48vmax] w-[48vmax] rounded-full bg-[radial-gradient(circle,var(--amb-3),transparent_64%)]"
           style={{ animationDelay: "2.8s" }}
         />
         <div
-          className="animate-pulse-glow absolute bottom-[8%] right-[18%] h-[38vmax] w-[38vmax] rounded-full bg-[radial-gradient(circle,var(--amb-1),transparent_62%)] blur-3xl"
+          className="animate-pulse-glow absolute bottom-[8%] right-[18%] h-[38vmax] w-[38vmax] rounded-full bg-[radial-gradient(circle,var(--amb-1),transparent_66%)]"
           style={{ animationDelay: "4s" }}
-        />
-        <div
-          className="animate-pulse-glow absolute left-[42%] top-[46%] h-[32vmax] w-[32vmax] rounded-full bg-[radial-gradient(circle,var(--amb-2),transparent_62%)] blur-3xl"
-          style={{ animationDelay: "5.4s" }}
         />
       </div>
 
@@ -178,12 +192,17 @@ export default function AmbientBackground() {
         }}
       />
 
-      {/* Canvas weave — the logo is paint on a surface, so the page has one too */}
-      <div className="canvas-tex absolute inset-0 opacity-70" />
-
-      {/* Film grain */}
+      {/* Film grain, plainly composited.
+          This carried `mix-blend-overlay`, and it sits directly above a canvas
+          that repaints every frame — so every ember redrawn forced the browser
+          to re-blend a full-screen layer against everything beneath it. Normal
+          compositing at a slightly higher opacity reads near enough identical
+          on a ground this dark, for none of that cost. The weave that used to
+          sit under it is gone entirely: two repeating gradients on a 3px period
+          across the whole viewport, at 1.4% alpha, is an enormous paint for
+          something invisible past the first pixel. */}
       <div
-        className="absolute inset-0 opacity-[0.16] mix-blend-overlay"
+        className="absolute inset-0 opacity-[0.055]"
         style={{
           backgroundImage:
             "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E\")",
