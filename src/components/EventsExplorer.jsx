@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CalendarDays, ChevronRight, Clock, Search, Trophy, User, Users, X } from "lucide-react";
-import { events } from "@/data/events";
+import { useFest } from "@/components/FestProvider";
 import { formatDate, formatTime, MEDALS } from "@/lib/format";
 import { MOTIFS } from "@/lib/assets";
 import { sectionAccent } from "@/lib/accents";
@@ -22,11 +22,13 @@ const MOTIF_CYCLE = ["guitar", "mask", "ballerina", "moonwalker"];
 const dayKey = (iso) => iso.slice(0, 10);
 
 /** Stable day numbers, derived from the whole line-up so filtering cannot
- *  renumber the programme under you. */
-const DAY_NUMBERS = (() => {
-  const days = [...new Set(events.map((e) => dayKey(e.date)))].sort();
+ *  renumber the programme under you. Taken over the full list rather than the
+ *  filtered one for that reason, and recomputed per render now that the
+ *  line-up arrives from the database and can gain an event mid-fest. */
+const dayNumbers = (events) => {
+  const days = [...new Set(events.map((e) => dayKey(e.date)).filter(Boolean))].sort();
   return Object.fromEntries(days.map((d, i) => [d, i + 1]));
-})();
+};
 
 // The 2025 data is all COMPLETED, but the page has to read properly for the
 // months before ENGENIA 2026 when nothing has a result yet.
@@ -83,6 +85,14 @@ export default function EventsExplorer() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
 
+  /* Live. An event whose results are still held back arrives with an empty
+     winners array — the row-level policy withheld the placings, so the card
+     simply has no results section until it is revealed, and gains one the
+     moment it is. */
+  const { events } = useFest();
+
+  const DAY_NUMBERS = useMemo(() => dayNumbers(events), [events]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return events.filter((e) => {
@@ -91,7 +101,7 @@ export default function EventsExplorer() {
       if (q && !e.name.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [division, type, query]);
+  }, [events, division, type, query]);
 
   // The programme: days in order, each split into its stage and grounds bills.
   const programme = useMemo(() => {
@@ -108,7 +118,7 @@ export default function EventsExplorer() {
       offstage: list.filter((e) => e.division === "OFFSTAGE"),
       count: list.length,
     }));
-  }, [filtered]);
+  }, [filtered, DAY_NUMBERS]);
 
   return (
     <div {...sectionAccent("crimson")}>

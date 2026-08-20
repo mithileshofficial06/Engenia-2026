@@ -1,22 +1,32 @@
-import { departments } from "@/data/site";
-import { events } from "@/data/events";
+import { departments as staticDepartments } from "@/data/site";
+import { events as staticEvents } from "@/data/events";
 
 /**
  * Standings, derived.
  *
- * Points are not stored anywhere. They are summed here from the event
- * results — every placing in `events.js` is worth `event.points[position]`,
- * and that sum *is* the leaderboard. Keeping a hand-written total alongside
- * the results meant the two could disagree with nothing to catch it; a
- * correction to a winner would leave the standings quietly wrong.
+ * Points are not stored anywhere — not in this file, not in the database.
+ * They are summed here from the event results: every placing is worth
+ * `event.points[position]`, and that sum *is* the leaderboard. Keeping a
+ * hand-written total alongside the results meant the two could disagree with
+ * nothing to catch it; a correction to a winner would leave the standings
+ * quietly wrong. The admin can rewrite a placing and the table is right on
+ * the next frame, because there is nothing else to update.
  *
- * Each department also carries the ledger that produced its total, so the
- * page can show its working rather than asserting a number.
+ * These used to be constants, computed once when the module first loaded and
+ * baked into the build. Now that the results arrive over a realtime socket and
+ * can change while someone is looking at the page, they are pure functions of
+ * whatever rows they are handed. The module-level exports at the foot are the
+ * same computation over the static files, kept as the fallback the site
+ * renders from before Supabase answers — or if it never does.
  */
 
 const POSITION_KEY = { 1: "gold", 2: "silver", 3: "bronze" };
 
-function build() {
+/**
+ * @param {Array} events       events, each with `points` and `winners`
+ * @param {Array} departments  the roster; anything not on it scores nothing
+ */
+export function buildStandings(events = [], departments = []) {
   const rows = new Map(
     departments.map((dept) => [
       dept.code,
@@ -98,33 +108,34 @@ function build() {
   return ranked;
 }
 
-export const standings = build();
-
-export const leader = standings[0] ?? null;
-
 /** Totals across the whole table, for the summary strip. */
-export const totals = standings.reduce(
-  (acc, row) => ({
-    points: acc.points + row.points,
-    medals: acc.medals + row.medals,
-  }),
-  { points: 0, medals: 0 },
-);
+export function buildTotals(standings = []) {
+  return standings.reduce(
+    (acc, row) => ({ points: acc.points + row.points, medals: acc.medals + row.medals }),
+    { points: 0, medals: 0 },
+  );
+}
 
 /**
  * Which fest these standings describe, and whether they are settled.
  *
- * Derived from the results rather than written down, so swapping `events.js`
- * for the 2026 line-up re-labels the page on its own instead of leaving a
- * stale year in the markup.
+ * Derived from the results rather than written down, so a new line-up
+ * re-labels the page on its own instead of leaving a stale year in the markup.
+ *
+ * `completed` counts events whose results are actually out, not events marked
+ * COMPLETED. During the fest those two diverge for exactly as long as it takes
+ * to walk from the judges' table to the stage — an event can be over while its
+ * placings are still held back — and the reader is being told how much of the
+ * leaderboard is settled, which is the published count.
  */
-export const season = (() => {
+export function buildSeason(events = []) {
   const dates = events.map((e) => e.date).filter(Boolean).sort();
   const year = dates.length ? new Date(dates[dates.length - 1]).getFullYear() : null;
   const total = events.length;
-  const completed = events.filter((e) => e.status === "COMPLETED").length;
+  const completed = events.filter((e) => (e.winners?.length ?? 0) > 0).length;
 
-  const state = total === 0 ? "empty" : completed === total ? "final" : completed > 0 ? "live" : "upcoming";
+  const state =
+    total === 0 ? "empty" : completed === total ? "final" : completed > 0 ? "live" : "upcoming";
 
   return {
     year,
@@ -134,4 +145,14 @@ export const season = (() => {
     label: { final: "Final", live: "Live", upcoming: "Not started", empty: "No results" }[state],
     lastResult: dates.length ? dates[dates.length - 1] : null,
   };
-})();
+}
+
+/* ── The static fallback ────────────────────────────────────────────────
+   What the page shows before the database answers, and what it keeps showing
+   if the database never does. Same computation, over the files the site
+   shipped with. */
+
+export const standings = buildStandings(staticEvents, staticDepartments);
+export const leader = standings[0] ?? null;
+export const totals = buildTotals(standings);
+export const season = buildSeason(staticEvents);

@@ -3,16 +3,13 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown, Crown, Medal, Trophy } from "lucide-react";
-import { standings, season } from "@/lib/standings";
+import { useFest } from "@/components/FestProvider";
 import { festival } from "@/data/site";
 import { formatDate, MEDALS } from "@/lib/format";
 import Counter from "@/components/Counter";
 import Reveal from "@/components/Reveal";
 
-const max = standings[0]?.points || 1;
-
 // Podium reading order: 2nd, 1st, 3rd.
-const podium = [standings[1], standings[0], standings[2]].filter(Boolean);
 const PODIUM_META = {
   0: { rank: 2, height: "h-28 sm:h-36", icon: Medal, tint: "rgba(232,216,187,.75)" },
   1: { rank: 1, height: "h-40 sm:h-52", icon: Crown, tint: "rgba(235,149,18,.9)" },
@@ -27,16 +24,15 @@ const TIER = [
 
 const DIM = "rgba(255,255,255,.2)";
 
-// The standings describe whichever fest the results came from, which is not
-// necessarily the one the site is advertising. Say which, up front.
-const isArchive = season.year != null && String(season.year) !== festival.year;
-
-const PROGRESS = {
-  final: `All ${season.total} events decided.`,
-  live: `${season.completed} of ${season.total} events decided.`,
-  upcoming: "No results in yet.",
-  empty: "No events on record.",
-}[season.state];
+/* How much of the table is settled. Reads off whatever season is current,
+   which now changes under the page as results are revealed. */
+const progressLine = (season) =>
+  ({
+    final: `All ${season.total} events decided.`,
+    live: `${season.completed} of ${season.total} events decided.`,
+    upcoming: "No results in yet.",
+    empty: "No events on record.",
+  })[season.state];
 
 /** The medal split, shown identically on the podium and in the folded-up
  *  mobile row. A tier a department never placed in reads as a quiet dash. */
@@ -104,6 +100,19 @@ function Ledger({ dept }) {
 
 export default function Leaderboard() {
   const [open, setOpen] = useState(null);
+
+  /* Live. The server put real rows in here on the first render, and
+     FestProvider swaps them the instant a result is revealed — so the podium
+     re-orders and the bars re-scale without anyone reloading. */
+  const { standings, season } = useFest();
+
+  const max = standings[0]?.points || 1;
+  const podium = [standings[1], standings[0], standings[2]].filter(Boolean);
+
+  // The standings describe whichever fest the results came from, which is not
+  // necessarily the one the site is advertising. Say which, up front.
+  const isArchive = season.year != null && String(season.year) !== festival.year;
+  const PROGRESS = progressLine(season);
 
   return (
     <section className="mx-auto max-w-5xl px-4 pb-28 md:px-8">

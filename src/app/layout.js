@@ -3,11 +3,6 @@ import "./globals.css";
 import { festival } from "@/data/site";
 import { FAVICON_SRC, OG_SRC } from "@/lib/assets";
 import AmbientBackground from "@/components/AmbientBackground";
-import IntroCurtain from "@/components/IntroCurtain";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import ScrollProgress from "@/components/ScrollProgress";
-import { WordmarkFlightProvider } from "@/components/WordmarkFlight";
 
 /* Display. Syne — the face drawn for an arts centre, and it shows: wide
    counters, angular joins, and an extrabold that reads as a poster rather
@@ -52,18 +47,20 @@ export const viewport = {
   initialScale: 1,
 };
 
+/**
+ * The root holds only what is true of every route: the document, the fonts,
+ * and the backdrop.
+ *
+ * The navbar, the footer, the scroll rail and the opening curtain moved down
+ * into the (site) group when the admin was added — see src/app/(site)/layout.js
+ * for why. Anything put back here appears in the control room too.
+ */
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${syne.variable} ${manrope.variable}`}>
       <body className="font-sans antialiased">
-        <IntroCurtain />
         <AmbientBackground />
-        <ScrollProgress />
-        <WordmarkFlightProvider>
-          <Navbar />
-          <main className="relative z-10">{children}</main>
-        </WordmarkFlightProvider>
-        <Footer />
+        {children}
       </body>
     </html>
   );
