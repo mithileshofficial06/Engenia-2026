@@ -42,7 +42,16 @@ export default function Hero() {
   });
 
   const contentY = useTransform(progress, [0, 1], [0, 90]);
-  const fade = useTransform(progress, [0, 0.2, 0.62], [1, 0.94, 0]);
+
+  /* Two fades, not one. The headline leaves with its own exit — the halves
+     are already travelling out the sides, so it should be gone by the time
+     they clear — but the counter and the buttons are still sitting in the
+     middle of the viewport at that point, and fading them on the headline's
+     curve emptied the hero while there was nothing yet to replace it. The
+     block below the headline therefore holds full strength until it is
+     genuinely on its way off the top, and only then fades. */
+  const headlineFade = useTransform(progress, [0, 0.24, 0.66], [1, 0.92, 0]);
+  const lowerFade = useTransform(progress, [0, 0.62, 0.98], [1, 1, 0]);
 
   // Scrolling runs the headline entrance backwards: the two halves part again
   // and travel back out the sides they came in from. The middle stop is the
@@ -77,7 +86,7 @@ export default function Hero() {
           style={{ aspectRatio: geometry.aspect }}
         />
 
-        <motion.div style={{ y: contentY, opacity: fade }} className="flex w-full flex-col items-center">
+        <motion.div style={{ y: contentY }} className="flex w-full flex-col items-center">
           {/* The headline arrives as two halves closing on the centre, and
               leaves the same way in reverse as the hero scrolls away.
 
@@ -86,7 +95,10 @@ export default function Hero() {
               the timed entrance. Framer Motion lets `style` and `animate`
               fight over a shared property, and x is claimed by both here, so
               they are kept on separate elements. */}
-          <h1 className="font-display mt-4 text-balance text-center text-[1.7rem] font-semibold leading-[1.14] tracking-tight sm:text-4xl md:text-[2.75rem]">
+          <motion.h1
+            style={{ opacity: headlineFade }}
+            className="font-display mt-4 text-balance text-center text-[1.7rem] font-semibold leading-[1.14] tracking-tight sm:text-4xl md:text-[2.75rem]"
+          >
             <motion.span style={{ x: partLeft, willChange: "transform" }} className="inline-block">
               <motion.span
                 initial={{ x: reduce ? "0%" : "-60%", opacity: 0 }}
@@ -107,53 +119,58 @@ export default function Hero() {
                 Extravaganza
               </motion.span>
             </motion.span>
-          </h1>
+          </motion.h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: LOGO_SETTLED + 0.55, duration: 0.7 }}
-            className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/55"
-          >
-            <span className="inline-flex items-center gap-2">
-              <CalendarDays size={15} className="text-gold-500" />
-              {festival.dates}
-            </span>
-            <span className="hidden h-4 w-px bg-white/15 sm:block" />
-            <span className="inline-flex items-center gap-2">
-              <MapPin size={15} className="text-crimson-500" />
-              {festival.location}
-            </span>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: LOGO_SETTLED + 0.7, duration: 0.7 }}
-            className="mt-9"
-          >
-            <Countdown target={festival.startsAt} />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: LOGO_SETTLED + 0.85, duration: 0.7 }}
-            className="mt-10 flex flex-col items-center gap-3 sm:flex-row"
-          >
-            <Link
-              href="/events"
-              className="btn btn-solid group inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold"
+          {/* Everything under the headline shares one fade, so the date line,
+              the counter and the buttons leave together rather than three
+              elements dimming at three slightly different moments. */}
+          <motion.div style={{ opacity: lowerFade }} className="flex w-full flex-col items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: LOGO_SETTLED + 0.55, duration: 0.7 }}
+              className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/55"
             >
-              Explore Events
-              <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
-            <Link
-              href="/leaderboard"
-              className="btn btn-ghost inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold"
+              <span className="inline-flex items-center gap-2">
+                <CalendarDays size={15} className="text-gold-500" />
+                {festival.dates}
+              </span>
+              <span className="hidden h-4 w-px bg-white/15 sm:block" />
+              <span className="inline-flex items-center gap-2">
+                <MapPin size={15} className="text-crimson-500" />
+                {festival.location}
+              </span>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: LOGO_SETTLED + 0.7, duration: 0.7 }}
+              className="mt-9"
             >
-              Live Leaderboard
-            </Link>
+              <Countdown target={festival.startsAt} />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: LOGO_SETTLED + 0.85, duration: 0.7 }}
+              className="mt-10 flex flex-col items-center gap-3 sm:flex-row"
+            >
+              <Link
+                href="/events"
+                className="btn btn-solid group inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold"
+              >
+                Explore Events
+                <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
+              <Link
+                href="/leaderboard"
+                className="btn btn-ghost inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold"
+              >
+                Live Leaderboard
+              </Link>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
