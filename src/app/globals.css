@@ -568,55 +568,193 @@ body {
   to   { opacity: 0.75; transform: scaleX(1); }
 }
 
-/* ── Banners dropping off the rail ────────────────────────────────────
-   A pennant hung on a cord does not fade in, it falls and then swings itself
-   still. So: the first 38% is the fall, easing *into* speed the way gravity
-   does rather than out of it, and the remaining ~0.5s is a pendulum losing
-   about 55% of its amplitude on each pass until it settles square.
+/* ── The department band ──────────────────────────────────────────────
+   Seven strips, each a window onto one shared gradient rather than a fill of
+   its own. The image is sized to the whole band — n times the strip — and
+   offset by the strip's index, so the seven reassemble into one unbroken
+   sweep of the logo arc. Departments.jsx builds the gradient and works out
+   which end each department belongs at.
 
-   Rotation is about the top edge, where the cord meets the cloth, which is the
-   only pivot that reads as hanging rather than as spinning.
+   Because the window is a fraction of the image rather than a fixed number of
+   pixels, a strip can widen without its hue sliding: background-size stays at
+   n × 100% of whatever width the strip currently has, so it always shows the
+   same 1/n of the arc, merely larger.
 
-   Each keyframe restates its own timing function on purpose: without that, the
-   stops after the fall would inherit the animation's easing and the swing
-   would arrive in lurches instead of gliding through each pass. */
-.banner-drop {
+   Narrow screens turn the band on its side — seven rows, the sweep running
+   top to bottom — which is the only arrangement where seven names fit without
+   being rotated or truncated. */
+
+.arc-band {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.arc-col {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  overflow: hidden;
+  color: var(--fg);
+  background-image: var(--band-y);
+  background-size: 100% calc(var(--n) * 100%);
+  background-position: 50% var(--slice);
+  /* The seam. A hairline of shadow rather than a border, so it darkens the
+     join without introducing a colour the palette does not have. */
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.22);
+  transition: flex-grow 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.arc-col:last-child { box-shadow: none; }
+
+.arc-col:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: -5px;
+}
+
+/* Dim the strips either side of the one being read. Opacity on a scrim
+   rather than a filter on the strip: a brightness() filter would have to
+   re-rasterise the whole gradient each time the pointer crossed a seam. */
+.arc-col::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-ink-950);
   opacity: 0;
-  transform-origin: 50% 0;
-  transform: translateY(-46px) rotate(-12deg);
+  pointer-events: none;
+  transition: opacity 0.45s ease;
 }
-.rise-in .banner-drop {
-  animation: banner-drop 0.88s both;
-  animation-delay: var(--drop-delay, 0ms);
+.arc-band:hover .arc-col::after { opacity: 0.34; }
+.arc-col:hover::after,
+.arc-col:focus-within::after { opacity: 0; }
+
+.arc-idx {
+  position: relative;
+  width: 1.5rem;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  opacity: 0.5;
+  font-variant-numeric: tabular-nums;
 }
-@keyframes banner-drop {
-  0% {
+
+.arc-code {
+  position: relative;
+  flex-shrink: 0;
+  width: 4.5rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.arc-name {
+  position: relative;
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.85;
+}
+
+@media (min-width: 1024px) {
+  .arc-band {
+    flex-direction: row;
+    height: clamp(19rem, 44vh, 25rem);
+  }
+
+  .arc-col {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    /* The foot of each strip is left empty on purpose: it is where the name
+       arrives, and reserving it means the type does not shift when it does. */
+    padding: 1.15rem 0.95rem 5.5rem;
+    background-image: var(--band-x);
+    background-size: calc(var(--n) * 100%) 100%;
+    background-position: var(--slice) 50%;
+    box-shadow: inset -1px 0 0 rgb(0 0 0 / 0.22);
+  }
+
+  .arc-col:hover,
+  .arc-col:focus-within { flex-grow: 2.4; }
+
+  .arc-idx { width: auto; }
+
+  /* Set on its side, reading bottom to top — the direction a spine reads, and
+     the one that keeps the ascenders facing the middle of the band. */
+  .arc-code {
+    width: auto;
+    margin: auto auto 0;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: clamp(1.05rem, 1.6vw, 1.5rem);
+    letter-spacing: 0.06em;
+  }
+
+  /* Centred, and a fixed width rather than a percentage.
+     Centred because a strip is only its own flat colour through the middle —
+     the outer fifth either side is on its way to the neighbour, and 11px type
+     parked in that ramp is reading against a blend nobody chose. The middle is
+     where the contrast was measured.
+     Fixed width because the strip is still growing underneath it, and a name
+     that re-wrapped on every frame of that would be unreadable for the whole
+     half second it takes. It is simply clipped until there is room. */
+  .arc-name {
+    position: absolute;
+    left: 50%;
+    bottom: 1.3rem;
+    width: 12rem;
+    padding-top: 0.7rem;
+    text-align: center;
     opacity: 0;
-    transform: translateY(-46px) rotate(-12deg);
-    animation-timing-function: cubic-bezier(0.4, 0, 0.85, 0.45);
+    transform: translate(-50%, 6px);
+    transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  14% {
+
+  .arc-name::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1.75rem;
+    height: 1px;
+    margin-left: -0.875rem;
+    background: currentColor;
+    opacity: 0.55;
+  }
+
+  .arc-col:hover .arc-name,
+  .arc-col:focus-within .arc-name {
     opacity: 1;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.85, 0.45);
+    transform: translate(-50%, 0);
   }
-  38% {
-    transform: translateY(0) rotate(9.5deg);
-    animation-timing-function: ease-in-out;
-  }
-  57% {
-    transform: translateY(0) rotate(-5.2deg);
-    animation-timing-function: ease-in-out;
-  }
-  73% {
-    transform: translateY(0) rotate(2.6deg);
-    animation-timing-function: ease-in-out;
-  }
-  87% {
-    transform: translateY(0) rotate(-1.1deg);
-    animation-timing-function: ease-in-out;
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) rotate(0deg);
+}
+
+/* Entrance: the strips open in sequence, each one wiping across the axis the
+   band runs on. One keyframe per orientation, because a row that unrolled
+   from the top would read as falling rather than as being drawn. */
+.arc-col {
+  clip-path: inset(0 100% 0 0);
+}
+.rise-in .arc-col {
+  animation: arc-draw 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i) * 70ms);
+}
+@keyframes arc-draw {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+@media (min-width: 1024px) {
+  .arc-col { clip-path: inset(0 0 100% 0); }
+  .rise-in .arc-col { animation-name: arc-drop; }
+  @keyframes arc-drop {
+    from { clip-path: inset(0 0 100% 0); }
+    to   { clip-path: inset(0 0 0 0); }
   }
 }

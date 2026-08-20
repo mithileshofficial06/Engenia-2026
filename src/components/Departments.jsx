@@ -6,26 +6,162 @@ import { departments } from "@/data/site";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import Flourish from "@/components/Flourish";
-import BrushRule from "@/components/BrushRule";
 import SectionShell from "@/components/SectionShell";
 import useReveal from "@/lib/useReveal";
 
-// Cord lengths. Kept gentle — enough that the row is not mechanical, small
-// enough that the name plates below still read as a line.
-const DROP = [0, 14, 6, 18, 4, 12, 8];
+/**
+ * The seven departments, as the logo arc cut into seven strips.
+ *
+ * The banner wall this replaces gave each department a saturated slab of its
+ * own colour, and seven of those side by side put more chroma on the page than
+ * any other section — it out-shouted the wordmark it was supposed to echo.
+ * Here the colour carries information instead: the band is one continuous
+ * sweep, and each strip is the part of it that its own department already owns
+ * everywhere else on the site.
+ *
+ * Two things make that work.
+ *
+ * The order is derived, not chosen. Each department's accent is projected onto
+ * the logo arc — the nearest point on the gradient in globals.css — and the
+ * columns are sorted by where they land. So the band runs ember, crimson,
+ * azure, jade, gold, the same left-to-right spread the artwork does, and no
+ * one had to hand-place a department to make it come out that way.
+ *
+ * Every strip shows a window onto the same gradient rather than a flat fill of
+ * its own. The gradient is sized to the whole band and offset by the strip's
+ * position in it (the same device the split headline uses), so the seven
+ * columns reassemble into one unbroken sweep — and a column can widen on hover
+ * without its hue drifting, because the window it shows is a fraction of the
+ * image, not a fixed number of pixels.
+ */
 
-// Pennant: square shoulders, V-notch out of the bottom.
-const PENNANT = "polygon(0 0, 100% 0, 100% 84%, 50% 100%, 0 84%)";
+// The stops of --grad-arc in globals.css, as numbers. Keep the two in step.
+const ARC = [
+  [0, "#f47115"],
+  [0.26, "#d41350"],
+  [0.52, "#077faf"],
+  [0.74, "#05bbae"],
+  [1, "#eb9512"],
+];
 
-const GOLD = "#eb9512";
-
-function rgbOf(hex) {
+function rgb(hex) {
   const n = Number.parseInt(hex.slice(1), 16);
-  return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
+/** The arc's colour at t, interpolated the way the browser paints it. */
+function arcAt(t) {
+  for (let i = 1; i < ARC.length; i += 1) {
+    const [t0, from] = ARC[i - 1];
+    const [t1, to] = ARC[i];
+    if (t > t1) continue;
+
+    const k = (t - t0) / (t1 - t0);
+    const a = rgb(from);
+    const b = rgb(to);
+    return a.map((v, j) => v + (b[j] - v) * k);
+  }
+  return rgb(ARC.at(-1)[1]);
+}
+
+/** Where a colour sits along the arc: the position of the closest point on it. */
+function arcPosition(hex) {
+  const c = rgb(hex);
+  let best = 0;
+  let bestDistance = Infinity;
+
+  for (let t = 0; t <= 1; t += 0.002) {
+    const s = arcAt(t);
+    const d = (s[0] - c[0]) ** 2 + (s[1] - c[1]) ** 2 + (s[2] - c[2]) ** 2;
+    if (d < bestDistance) {
+      bestDistance = d;
+      best = t;
+    }
+  }
+  return best;
+}
+
+function luminance([r, g, b]) {
+  const lin = [r, g, b].map((v) => {
+    const s = v / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+}
+
+const INK = "#070403";
+const CREAM = "#fff8ec";
+const L_INK = luminance(rgb(INK));
+const L_CREAM = luminance(rgb(CREAM));
+const contrast = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+
+const ORDER = [...departments].sort((a, b) => arcPosition(a.accent) - arcPosition(b.accent));
+const COUNT = ORDER.length;
+
+/**
+ * How much of a strip is flat.
+ *
+ * Pinning one stop per department, at the centre of its strip, made the whole
+ * band a blend — every strip was on its way somewhere else, and none of them
+ * was actually the colour the leaderboard gives that department. Two stops
+ * hold the middle 60% flat and leave the blending to the seams, which is where
+ * the eye wants it: the sweep still reads as continuous, and each strip is
+ * unmistakably its own colour for most of its width.
+ */
+const EDGE = 0.2;
+
+const STOPS = ORDER.flatMap((dept, i) => [
+  [(i + EDGE) / COUNT, rgb(dept.accent)],
+  [(i + 1 - EDGE) / COUNT, rgb(dept.accent)],
+]);
+
+/** The band's colour at u, where u runs 0..1 across the whole band. */
+function bandAt(u) {
+  if (u <= STOPS[0][0]) return STOPS[0][1];
+  if (u >= STOPS.at(-1)[0]) return STOPS.at(-1)[1];
+
+  for (let i = 1; i < STOPS.length; i += 1) {
+    const [at, colour] = STOPS[i];
+    if (u > at) continue;
+    const [prevAt, prev] = STOPS[i - 1];
+    const k = at === prevAt ? 0 : (u - prevAt) / (at - prevAt);
+    return prev.map((v, j) => v + (colour[j] - v) * k);
+  }
+  return STOPS.at(-1)[1];
+}
+
+/**
+ * Ink or cream over strip i, whichever survives the whole strip.
+ *
+ * Asking this of the accent alone got it wrong at the seams. A strip runs from
+ * one blend to another — azure's left edge is half crimson — and a type colour
+ * that clears AA against the accent by a hair can be down near 2.8:1 twenty
+ * pixels away. So both candidates are scored across the strip and the one with
+ * the better worst case wins.
+ */
+function readableOver(i) {
+  let worstInk = Infinity;
+  let worstCream = Infinity;
+
+  for (let k = 0; k <= 8; k += 1) {
+    const l = luminance(bandAt((i + k / 8) / COUNT));
+    worstInk = Math.min(worstInk, contrast(l, L_INK));
+    worstCream = Math.min(worstCream, contrast(l, L_CREAM));
+  }
+  return worstInk >= worstCream ? INK : CREAM;
+}
+
+/* The band's gradient, in the direction the strips run. */
+const band = (angle) =>
+  `linear-gradient(${angle}, ${STOPS.map(
+    ([at, colour]) => `rgb(${colour.map(Math.round).join(" ")}) ${(at * 100).toFixed(2)}%`,
+  ).join(", ")})`;
+
+const BAND_X = band("90deg");
+const BAND_Y = band("180deg");
+
 export default function Departments() {
-  const [railRef, railState] = useReveal({ amount: 0.15 });
+  const [bandRef, bandState] = useReveal({ amount: 0.15 });
 
   return (
     <SectionShell id="departments" hue="jade" className="px-4 py-16 sm:py-24 md:px-8">
@@ -40,146 +176,33 @@ export default function Departments() {
           subtitle="Seven departments competing for cultural supremacy."
         />
 
-        {/* The hall: a gilded rail with seven banners hung off it. Standings
-            live on the leaderboard — this section is only about who competes.
-
-            The banners used to sway forever on seven infinite Framer Motion
-            loops, each one rotating a clipped element carrying a drop shadow —
-            seven blurred surfaces re-rasterising every frame for as long as the
-            page was open, whether or not the section was even on screen. They
-            now fall once, swing themselves still over about half a second, and
-            cost nothing after that. The pendulum is `banner-drop` in
-            globals.css. */}
-        <div ref={railRef} className={`relative mt-16 ${railState}`}>
-          {/* rail, with a soft glow and tapered ends */}
-          <span
-            aria-hidden
-            className="absolute inset-x-0 top-0 h-[2px] rounded-full"
-            style={{
-              background: `linear-gradient(90deg, transparent, ${GOLD} 12%, ${GOLD} 88%, transparent)`,
-              boxShadow: `0 0 14px rgb(${rgbOf(GOLD)} / .5)`,
-              opacity: 0.75,
-            }}
-          />
-
-          <ul className="grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-4 lg:grid-cols-7 lg:gap-x-3">
-            {departments.map((dept, i) => {
-              const rgb = rgbOf(dept.accent);
-              const drop = DROP[i % DROP.length];
-              // Banners come off the rail left to right, close enough together
-              // that the row reads as one gesture rather than as seven.
-              const delay = i * 80;
-
-              return (
-                <li key={dept.code} className="group flex flex-col items-center">
-                  {/* ring on the rail */}
-                  <span
-                    aria-hidden
-                    className="-mt-[6px] h-3 w-3 shrink-0 rounded-full border-2 bg-ink-950"
-                    style={{ borderColor: GOLD, boxShadow: `0 0 10px rgb(${rgbOf(GOLD)} / .6)` }}
-                  />
-                  {/* cord */}
-                  <span
-                    aria-hidden
-                    className="w-px shrink-0"
-                    style={{
-                      height: drop + 16,
-                      background: `linear-gradient(to bottom, rgb(${rgbOf(GOLD)} / .75), rgb(${rgb} / .5))`,
-                    }}
-                  />
-
-                  {/* The falling element. Pivots on its top edge, where the cord
-                      meets the cloth — any other origin reads as a spin rather
-                      than as something hanging. */}
-                  <div className="banner-drop w-full" style={{ "--drop-delay": `${delay}ms` }}>
-                    <div className="flex flex-col items-center">
-                      <div className="relative w-full transition-transform duration-500 group-hover:-translate-y-1">
-                        <div
-                          className="relative flex flex-col items-center justify-center gap-2 px-2 py-5"
-                          style={{
-                            clipPath: PENNANT,
-                            aspectRatio: "0.74",
-                            // Dyed cloth: the hue near-solid at the top, sinking
-                            // into ink at the hem. Deep enough that ivory type
-                            // reads cleanly on every one of the seven.
-                            background: `linear-gradient(180deg, rgb(${rgb} / .95), rgb(${rgb} / .68) 46%, rgb(${rgb} / .34) 78%, rgb(${rgb} / .22)), #0d0907`,
-                            // Shaped shadow, so it follows the V-notch. Kept
-                            // tight: this is the one surface that has to be
-                            // re-rasterised while the banner swings.
-                            filter: `drop-shadow(0 12px 14px rgb(0 0 0 / .5))`,
-                          }}
-                        >
-                          {/* woven folds + a broad highlight down the left third */}
-                          <span
-                            aria-hidden
-                            className="pointer-events-none absolute inset-0 opacity-40"
-                            style={{
-                              backgroundImage:
-                                "repeating-linear-gradient(90deg, rgb(0 0 0 / .22) 0 1px, transparent 1px 15px)",
-                            }}
-                          />
-                          <span
-                            aria-hidden
-                            className="pointer-events-none absolute inset-0"
-                            style={{
-                              backgroundImage:
-                                "linear-gradient(100deg, transparent 8%, rgb(255 248 236 / .16) 32%, transparent 58%)",
-                            }}
-                          />
-                          {/* gilt trim along the top edge */}
-                          <span
-                            aria-hidden
-                            className="absolute inset-x-0 top-0 h-[3px]"
-                            style={{ background: `linear-gradient(90deg, ${GOLD}, #ffc554, ${GOLD})` }}
-                          />
-                          {/* stitched inner border */}
-                          <span
-                            aria-hidden
-                            className="pointer-events-none absolute inset-[6px] opacity-45"
-                            style={{
-                              clipPath: PENNANT,
-                              border: `1px dashed rgb(255 248 236 / .38)`,
-                            }}
-                          />
-
-                          <span aria-hidden className="relative text-[9px] leading-none" style={{ color: GOLD }}>
-                            ◆
-                          </span>
-
-                          <span
-                            className="font-display relative text-center text-xl font-semibold leading-none tracking-tight text-cream-100 sm:text-2xl"
-                            style={{ textShadow: "0 2px 12px rgb(0 0 0 / .55)" }}
-                          >
-                            {dept.code}
-                          </span>
-
-                          <BrushRule width={40} className="relative opacity-80" style={{ color: GOLD }} />
-                        </div>
-
-                        {/* tassel at the hem */}
-                        <span
-                          aria-hidden
-                          className="absolute left-1/2 top-full h-2.5 w-2.5 -translate-x-1/2 -translate-y-[5px] rotate-45"
-                          style={{ background: GOLD, boxShadow: `0 0 10px rgb(${rgbOf(GOLD)} / .7)` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* The name plate stays out of the swing. A caption that swung
-                      with its banner would be unreadable, and it belongs to the
-                      row rather than to the cloth. */}
-                  <p
-                    style={{ "--rise-delay": `${delay + 420}ms` }}
-                    className="rise-up mt-6 text-balance text-center text-[11px] leading-snug text-cream-300/60 transition-colors duration-500 group-hover:text-cream-100"
-                  >
-                    {dept.name}
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        {/* Standings live on the leaderboard — this is only about who competes,
+            so nothing here is ranked and the order is by hue alone. */}
+        <ul
+          ref={bandRef}
+          className={`arc-band mt-14 ${bandState}`}
+          style={{ "--n": COUNT, "--band-x": BAND_X, "--band-y": BAND_Y }}
+        >
+          {ORDER.map((dept, i) => (
+            <li
+              key={dept.code}
+              tabIndex={0}
+              className="arc-col"
+              style={{
+                "--i": i,
+                // Window onto the band: strip i of n. See the note above.
+                "--slice": `${((i / (COUNT - 1)) * 100).toFixed(3)}%`,
+                "--fg": readableOver(i),
+              }}
+            >
+              <span aria-hidden className="arc-idx">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="arc-code">{dept.code}</span>
+              <span className="arc-name">{dept.name}</span>
+            </li>
+          ))}
+        </ul>
 
         <Reveal from="up" delay={0.1} className="mt-12 flex justify-center">
           <Link
