@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -7,7 +8,16 @@ import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { festival, navLinks } from "@/data/site";
 import geometry from "@/data/wordmark.json";
+import { COLLEGE_LOGO } from "@/lib/assets";
 import { useWordmarkFlight } from "@/components/WordmarkFlight";
+
+/* The crest waits for the fest wordmark to finish arriving before it appears.
+   The letters land at 2.07s (WordmarkFlight staggers seven of them at
+   0.3 + i * 0.12 with a 1.05s drop) and the curtain is off them shortly
+   after; showing the college mark in the same breath as the opening would
+   read as two logos competing for the same moment. Same number the hero
+   sequences its own content off — if the stagger changes, both move. */
+const LOGO_SETTLED = 2.4;
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -94,6 +104,27 @@ export default function Navbar() {
             >
               Explore Events
             </Link>
+
+            {/* The college the fest belongs to. It sits past the call to
+                action deliberately: the crest is provenance, not navigation,
+                and putting it before the button would make it compete with
+                the fest's own wordmark at the other end of the bar. */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.86 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: LOGO_SETTLED, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-center gap-2 md:gap-3"
+            >
+              <span aria-hidden className="hidden h-6 w-px bg-white/12 md:block" />
+              <Image
+                src={COLLEGE_LOGO.src}
+                alt={festival.college}
+                width={COLLEGE_LOGO.width}
+                height={COLLEGE_LOGO.height}
+                priority
+                className="h-9 w-9 shrink-0 object-contain sm:h-10 sm:w-10"
+              />
+            </motion.div>
 
             <button
               type="button"

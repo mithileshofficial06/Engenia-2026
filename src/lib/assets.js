@@ -1,4 +1,5 @@
 import geometry from "@/data/wordmark.json";
+import college from "@/data/college.json";
 
 /**
  * Generated logo assets, resolved through the manifest that
@@ -16,3 +17,9 @@ export const DROPCAP_SRC = geometry.dropcap;
 
 /** The cultural figures cut out of the wordmark, keyed by name. */
 export const MOTIFS = geometry.motifs;
+
+/**
+ * The college crest, paper knocked out, from scripts/prepare-college-logo.mjs.
+ * Same hashed-path rule as everything above: read it from here, never inline.
+ */
+export const COLLEGE_LOGO = college;
