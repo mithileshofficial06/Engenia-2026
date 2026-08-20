@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { departments } from "@/data/site";
+import { departments, highlights } from "@/data/site";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import Flourish from "@/components/Flourish";
@@ -12,14 +13,16 @@ import useReveal from "@/lib/useReveal";
 /**
  * The seven departments, as the logo arc cut into seven strips.
  *
- * The banner wall this replaces gave each department a saturated slab of its
- * own colour, and seven of those side by side put more chroma on the page than
- * any other section — it out-shouted the wordmark it was supposed to echo.
- * Here the colour carries information instead: the band is one continuous
- * sweep, and each strip is the part of it that its own department already owns
- * everywhere else on the site.
+ * Each strip is a photograph from the fest, held well back, with the logo arc
+ * running across the band as trim rather than as fill.
  *
- * Two things make that work.
+ * Colour used to be the fill: seven saturated slabs, which put more chroma on
+ * the page than any other section and read as a swatch book rather than as a
+ * fest. The photographs carry the section now — dimmed and drained almost to
+ * grey so seven of them side by side stay quiet — and the arc survives in two
+ * thin layers: a wash over each strip that tints it toward its department's
+ * own colour, and a hairline at the foot at full strength. Same information,
+ * a fraction of the volume.
  *
  * The order is derived, not chosen. Each department's accent is projected onto
  * the logo arc — the nearest point on the gradient in globals.css — and the
@@ -27,10 +30,10 @@ import useReveal from "@/lib/useReveal";
  * azure, jade, gold, the same left-to-right spread the artwork does, and no
  * one had to hand-place a department to make it come out that way.
  *
- * Every strip shows a window onto the same gradient rather than a flat fill of
- * its own. The gradient is sized to the whole band and offset by the strip's
- * position in it (the same device the split headline uses), so the seven
- * columns reassemble into one unbroken sweep — and a column can widen on hover
+ * Both colour layers show a window onto one shared gradient rather than a fill
+ * of their own. The gradient is sized to the whole band and offset by the
+ * strip's position in it (the same device the split headline uses), so the
+ * seven reassemble into an unbroken sweep — and a strip can widen on hover
  * without its hue drifting, because the window it shows is a fraction of the
  * image, not a fixed number of pixels.
  */
@@ -81,20 +84,6 @@ function arcPosition(hex) {
   return best;
 }
 
-function luminance([r, g, b]) {
-  const lin = [r, g, b].map((v) => {
-    const s = v / 255;
-    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
-}
-
-const INK = "#070403";
-const CREAM = "#fff8ec";
-const L_INK = luminance(rgb(INK));
-const L_CREAM = luminance(rgb(CREAM));
-const contrast = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-
 const ORDER = [...departments].sort((a, b) => arcPosition(a.accent) - arcPosition(b.accent));
 const COUNT = ORDER.length;
 
@@ -115,42 +104,6 @@ const STOPS = ORDER.flatMap((dept, i) => [
   [(i + 1 - EDGE) / COUNT, rgb(dept.accent)],
 ]);
 
-/** The band's colour at u, where u runs 0..1 across the whole band. */
-function bandAt(u) {
-  if (u <= STOPS[0][0]) return STOPS[0][1];
-  if (u >= STOPS.at(-1)[0]) return STOPS.at(-1)[1];
-
-  for (let i = 1; i < STOPS.length; i += 1) {
-    const [at, colour] = STOPS[i];
-    if (u > at) continue;
-    const [prevAt, prev] = STOPS[i - 1];
-    const k = at === prevAt ? 0 : (u - prevAt) / (at - prevAt);
-    return prev.map((v, j) => v + (colour[j] - v) * k);
-  }
-  return STOPS.at(-1)[1];
-}
-
-/**
- * Ink or cream over strip i, whichever survives the whole strip.
- *
- * Asking this of the accent alone got it wrong at the seams. A strip runs from
- * one blend to another — azure's left edge is half crimson — and a type colour
- * that clears AA against the accent by a hair can be down near 2.8:1 twenty
- * pixels away. So both candidates are scored across the strip and the one with
- * the better worst case wins.
- */
-function readableOver(i) {
-  let worstInk = Infinity;
-  let worstCream = Infinity;
-
-  for (let k = 0; k <= 8; k += 1) {
-    const l = luminance(bandAt((i + k / 8) / COUNT));
-    worstInk = Math.min(worstInk, contrast(l, L_INK));
-    worstCream = Math.min(worstCream, contrast(l, L_CREAM));
-  }
-  return worstInk >= worstCream ? INK : CREAM;
-}
-
 /* The band's gradient, in the direction the strips run. */
 const band = (angle) =>
   `linear-gradient(${angle}, ${STOPS.map(
@@ -159,6 +112,14 @@ const band = (angle) =>
 
 const BAND_X = band("90deg");
 const BAND_Y = band("180deg");
+
+/* The fest's own photographs, in the order the gallery holds them. There are
+   fewer of these than there are departments, so one comes back round — which
+   is why each strip also carries its own focal point: the two strips sharing a
+   photograph are at opposite ends of the band and are cropped to different
+   parts of it, and nothing reads as a repeat. */
+const SHOTS = highlights.map((shot) => shot.src);
+const FOCUS = ["50%", "36%", "62%", "44%", "58%", "38%", "66%"];
 
 export default function Departments() {
   const [bandRef, bandState] = useReveal({ amount: 0.15 });
@@ -192,9 +153,22 @@ export default function Departments() {
                 "--i": i,
                 // Window onto the band: strip i of n. See the note above.
                 "--slice": `${((i / (COUNT - 1)) * 100).toFixed(3)}%`,
-                "--fg": readableOver(i),
+                "--focus": FOCUS[i % FOCUS.length],
               }}
             >
+              {/* Atmosphere, not content — the photographs say "this is a fest
+                  with a crowd in it" and nothing more, so they are unlabelled
+                  and a screen reader is right to skip them. */}
+              <Image
+                src={SHOTS[i % SHOTS.length]}
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 100vw, 20vw"
+                className="arc-shot"
+              />
+              <span aria-hidden className="arc-tint arc-slice" />
+              <span aria-hidden className="arc-edge arc-slice" />
+
               <span aria-hidden className="arc-idx">
                 {String(i + 1).padStart(2, "0")}
               </span>
