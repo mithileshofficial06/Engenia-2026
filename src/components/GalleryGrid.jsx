@@ -64,7 +64,7 @@ export default function GalleryGrid() {
 
             <span className="absolute inset-x-0 bottom-0 p-4 text-left">
               <span className="bg-fest mb-2 block h-[3px] w-8 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              <span className="font-display block text-balance text-base font-bold leading-tight text-cream-100 sm:text-lg">
+              <span className="font-display block text-balance text-sm font-semibold leading-tight text-cream-100 sm:text-base">
                 {photo.title}
               </span>
             </span>
@@ -135,7 +135,7 @@ export default function GalleryGrid() {
                 />
               </div>
               <figcaption className="mt-5 max-w-2xl text-center">
-                <h2 className="font-display text-balance text-xl font-bold sm:text-2xl">{photos[index].title}</h2>
+                <h2 className="font-display text-balance text-lg font-semibold sm:text-xl">{photos[index].title}</h2>
                 <p className="mt-2 text-pretty text-sm leading-relaxed text-white/55">{photos[index].body}</p>
                 <p className="mt-3 text-[10px] uppercase tracking-[0.3em] text-white/30">
                   {index + 1} / {photos.length}

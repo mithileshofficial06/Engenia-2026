@@ -128,7 +128,7 @@ export default function Navbar() {
                 >
                   <Link
                     href={link.href}
-                    className="font-display block border-b border-white/10 py-4 text-center text-3xl font-bold text-white/90 transition-colors hover:text-crimson-400"
+                    className="font-display block border-b border-white/10 py-4 text-center text-2xl font-semibold text-white/90 transition-colors hover:text-crimson-400"
                   >
                     {link.label}
                   </Link>

@@ -289,9 +289,12 @@ body {
    The static cards underneath already hold the new top and the old bottom,
    so what the eye follows is a single flap turning over.                   */
 
+.flip-clock {
+  --flip-h: 3.4rem;
+  --flip-w: 2.25rem;
+}
+
 .flip {
-  --flip-h: 4.75rem;
-  --flip-w: 3.1rem;
   position: relative;
   width: var(--flip-w);
   height: var(--flip-h);
@@ -300,10 +303,27 @@ body {
 }
 
 @media (min-width: 640px) {
-  .flip {
-    --flip-h: 6rem;
-    --flip-w: 4rem;
+  .flip-clock {
+    --flip-h: 4.25rem;
+    --flip-w: 2.85rem;
   }
+}
+
+/* The colons between the units. A counter split into four separate stacks
+   reads as four numbers; the colons are what make it read as one time. They
+   sit on the cards' centre line, take their size from the same var, and stay
+   still — a blinking separator is a wall clock's idiom, not a flap board's. */
+.flip-sep {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.65rem;
+  height: var(--flip-h);
+  font-family: var(--font-sans);
+  font-size: calc(var(--flip-h) * 0.3);
+  font-weight: 500;
+  line-height: 1;
+  color: rgb(255 248 236 / 0.3);
 }
 
 /* The notches either side of the hinge, where a real unit would be pinned. */
@@ -353,10 +373,17 @@ body {
   height: var(--flip-h);
   line-height: var(--flip-h);
   text-align: center;
-  font-family: var(--font-display);
-  font-size: calc(var(--flip-h) * 0.66);
-  font-weight: 900;
-  color: var(--color-cream-100);
+  /* The numerals are set in the text face, not the display one, and at a
+     normal weight. Syne at 900 turned the counter into four poster letters:
+     the strokes closed up the counters at this size and the whole block read
+     heavier than the headline above it. A flap board uses a plain grotesque —
+     Manrope's tabular figures are that, and they hold their width as the
+     digits turn. */
+  font-family: var(--font-sans);
+  font-size: calc(var(--flip-h) * 0.56);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--color-cream-200);
 }
 
 /* Each half shows the numeral at full height, anchored so the overflow

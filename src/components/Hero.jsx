@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import { festival } from "@/data/site";
 import Countdown from "@/components/Countdown";
@@ -28,13 +28,29 @@ export default function Hero() {
 
   const reduce = useReducedMotion();
 
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 90]);
-  const fade = useTransform(scrollYProgress, [0, 0.62], [1, 0]);
+  /* Scroll progress arrives as a step function — a wheel notch or a trackpad
+     flick delivers it in jumps — so reading x straight off it made the exit
+     stutter in exactly the places the timed entrance was smooth. It goes
+     through one spring first, and every property below reads that spring, so
+     the headline, the drift and the fade all run on the same clock instead of
+     three that can disagree by a frame. */
+  const progress = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 26,
+    mass: 0.4,
+    restDelta: 0.0005,
+  });
+
+  const contentY = useTransform(progress, [0, 1], [0, 90]);
+  const fade = useTransform(progress, [0, 0.2, 0.62], [1, 0.94, 0]);
 
   // Scrolling runs the headline entrance backwards: the two halves part again
-  // and travel back out the sides they came in from.
-  const partLeft = useTransform(scrollYProgress, [0, 0.5], [0, reduce ? 0 : -280]);
-  const partRight = useTransform(scrollYProgress, [0, 0.5], [0, reduce ? 0 : 280]);
+  // and travel back out the sides they came in from. The middle stop is the
+  // ease — on a straight two-stop ramp the halves leave at full speed from the
+  // first pixel of scroll, which is what read as a jerk rather than an exit.
+  const travel = reduce ? [0, 0, 0] : [0, 26, 300];
+  const partLeft = useTransform(progress, [0, 0.3, 0.68], travel.map((v) => -v));
+  const partRight = useTransform(progress, [0, 0.3, 0.68], travel);
 
 
   return (
@@ -70,8 +86,8 @@ export default function Hero() {
               the timed entrance. Framer Motion lets `style` and `animate`
               fight over a shared property, and x is claimed by both here, so
               they are kept on separate elements. */}
-          <h1 className="font-display mt-4 text-balance text-center text-3xl font-bold leading-[1.08] tracking-tight sm:text-5xl md:text-6xl">
-            <motion.span style={{ x: partLeft }} className="inline-block">
+          <h1 className="font-display mt-4 text-balance text-center text-[1.7rem] font-semibold leading-[1.14] tracking-tight sm:text-4xl md:text-[2.75rem]">
+            <motion.span style={{ x: partLeft, willChange: "transform" }} className="inline-block">
               <motion.span
                 initial={{ x: reduce ? "0%" : "-60%", opacity: 0 }}
                 animate={{ x: "0%", opacity: 1 }}
@@ -81,7 +97,7 @@ export default function Hero() {
                 Experience the
               </motion.span>
             </motion.span>{" "}
-            <motion.span style={{ x: partRight }} className="inline-block">
+            <motion.span style={{ x: partRight, willChange: "transform" }} className="inline-block">
               <motion.span
                 initial={{ x: reduce ? "0%" : "60%", opacity: 0 }}
                 animate={{ x: "0%", opacity: 1 }}

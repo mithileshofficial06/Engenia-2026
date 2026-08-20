@@ -35,7 +35,7 @@ export default function AnnouncementsPage() {
                   <Megaphone size={12} className="text-gold-500" />
                   {formatDate(item.createdAt)} · {formatTime(item.createdAt)}
                 </div>
-                <h2 className="font-display mt-3 text-balance text-2xl font-bold leading-snug sm:text-3xl">
+                <h2 className="font-display mt-3 text-balance text-xl font-semibold leading-snug sm:text-2xl">
                   {item.title}
                 </h2>
                 <p className="mt-3 whitespace-pre-line text-pretty text-sm leading-relaxed text-white/60 sm:text-base">

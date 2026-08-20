@@ -273,7 +273,7 @@ export default function Highlights() {
 
                     <figcaption className="absolute inset-x-0 bottom-0 p-6 sm:p-9 md:p-10">
                       <span className="bg-fest mb-3 block h-[3px] w-10" />
-                      <h3 className="font-display text-balance text-xl font-bold leading-tight text-cream-100 sm:text-2xl md:text-3xl">
+                      <h3 className="font-display text-balance text-lg font-semibold leading-tight text-cream-100 sm:text-xl md:text-2xl">
                         {item.title}
                       </h3>
                       <p className="mt-2 line-clamp-2 max-w-xl text-pretty text-sm leading-relaxed text-white/65 sm:mt-3 sm:line-clamp-3 sm:text-base">

@@ -44,13 +44,13 @@ export default function PageHeader({ eyebrow, title, accent, subtitle, hue = "em
           title={title}
           accent={accent}
           delay={120}
-          className="text-fest font-display mt-5 text-balance text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl md:text-7xl"
+          className="text-fest font-display mt-5 text-balance text-[2rem] font-semibold leading-[1.08] tracking-tight sm:text-[2.5rem] md:text-[3rem]"
         />
 
         {subtitle && (
           <p
             style={{ "--rise-delay": "460ms" }}
-            className="rise-up mt-5 max-w-2xl text-pretty text-base leading-relaxed text-white/55 sm:text-lg"
+            className="rise-up mt-5 max-w-xl text-pretty text-sm leading-relaxed text-white/55 sm:text-base"
           >
             {subtitle}
           </p>

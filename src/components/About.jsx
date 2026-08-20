@@ -49,7 +49,7 @@ export default function About() {
                 </span>
               )}
 
-              <p className="text-pretty text-lg leading-[1.75] text-cream-300/75 sm:text-xl sm:leading-[1.8]">
+              <p className="text-pretty text-base leading-[1.8] text-cream-300/75 sm:text-lg sm:leading-[1.85]">
                 {/* The drop cap is an image, so the letter it stands in for has
                     to be given back to screen readers here. */}
                 {opensOnE && <span className="sr-only">E</span>}
@@ -68,7 +68,7 @@ export default function About() {
                   <dt className="text-[11px] font-medium uppercase tracking-[0.26em] text-cream-400/70">
                     {stat.label}
                   </dt>
-                  <dd className="font-display text-3xl font-bold tabular-nums text-cream-100 sm:text-4xl">
+                  <dd className="font-display text-2xl font-semibold tabular-nums text-cream-100 sm:text-3xl">
                     <Counter value={stat.value} suffix={stat.suffix} />
                   </dd>
                 </div>
@@ -109,13 +109,13 @@ export default function About() {
 
                 <div className="relative max-w-[78%]">
                   <span
-                    className="font-display text-3xl font-black leading-none tabular-nums opacity-45 transition-opacity duration-500 group-hover:opacity-100"
+                    className="font-display text-2xl font-semibold leading-none tabular-nums opacity-45 transition-opacity duration-500 group-hover:opacity-100"
                     style={{ color: "var(--accent)" }}
                   >
                     {String(i + 1).padStart(2, "0")}
                   </span>
 
-                  <h3 className="font-display mt-3 text-balance text-xl font-bold leading-snug text-cream-100 sm:text-2xl">
+                  <h3 className="font-display mt-3 text-balance text-lg font-semibold leading-snug text-cream-100 sm:text-xl">
                     {pillar.title}
                   </h3>
 

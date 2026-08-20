@@ -147,7 +147,7 @@ export default function Departments() {
                           </span>
 
                           <span
-                            className="font-display relative text-center text-2xl font-black leading-none tracking-tight text-cream-100 sm:text-[1.75rem]"
+                            className="font-display relative text-center text-xl font-semibold leading-none tracking-tight text-cream-100 sm:text-2xl"
                             style={{ textShadow: "0 2px 12px rgb(0 0 0 / .55)" }}
                           >
                             {dept.code}

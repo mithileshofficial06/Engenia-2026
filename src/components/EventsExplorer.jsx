@@ -208,7 +208,7 @@ function DayHeader({ date, day, count, finale }) {
             Day {String(day).padStart(2, "0")}
             {finale && " · The finale"}
           </p>
-          <h2 className="font-display mt-2 text-3xl font-bold leading-none text-cream-100 sm:text-4xl">
+          <h2 className="font-display mt-2 text-2xl font-semibold leading-none text-cream-100 sm:text-3xl">
             {weekday}
             <span className="ml-3 text-cream-400/55">{dayMonth}</span>
           </h2>
@@ -281,7 +281,7 @@ function PosterCard({ event, index, onOpen }) {
           </span>
         </div>
 
-        <h3 className="font-display mt-4 text-balance text-2xl font-bold leading-tight text-cream-100 sm:text-3xl">
+        <h3 className="font-display mt-4 text-balance text-xl font-semibold leading-tight text-cream-100 sm:text-2xl">
           {event.name}
         </h3>
 
@@ -318,7 +318,7 @@ function EventRow({ event, onOpen }) {
         </span>
 
         <span className="min-w-0">
-          <span className="font-display block truncate text-lg font-bold text-cream-100 transition-colors duration-300 group-hover:text-[var(--accent)] sm:text-xl">
+          <span className="font-display block truncate text-base font-semibold text-cream-100 transition-colors duration-300 group-hover:text-[var(--accent)] sm:text-xl">
             {event.name}
           </span>
           <span className="mt-0.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-cream-400/55">
@@ -406,7 +406,7 @@ function EventModal({ event, onClose }) {
             </span>
           </div>
 
-          <h2 className="font-display mt-4 text-balance text-3xl font-bold leading-tight sm:text-4xl">
+          <h2 className="font-display mt-4 text-balance text-2xl font-semibold leading-tight sm:text-3xl">
             {event.name}
           </h2>
 
@@ -430,7 +430,7 @@ function EventModal({ event, onClose }) {
                 <p className={`text-[10px] font-bold uppercase tracking-[0.18em] ${MEDALS[pos].text}`}>
                   {MEDALS[pos].label}
                 </p>
-                <p className="font-display mt-1 text-2xl font-bold text-cream-100">{event.points[pos]}</p>
+                <p className="font-display mt-1 text-xl font-semibold text-cream-100">{event.points[pos]}</p>
                 <p className="text-[9px] uppercase tracking-[0.18em] text-cream-400/50">points</p>
               </div>
             ))}

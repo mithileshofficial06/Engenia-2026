@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 const UNITS = [
   { key: "days", label: "Days" },
@@ -111,18 +111,24 @@ export default function Countdown({ target }) {
     <div role="timer" aria-label={spoken}>
       <span className="sr-only">{spoken}</span>
 
-      <div aria-hidden className="flex items-start gap-3 sm:gap-5">
-        {UNITS.map((unit) => (
-          <div key={unit.key} className="flex flex-col items-center gap-3">
-            <div className="flex gap-1.5 sm:gap-2">
-              {digitsOf(time?.[unit.key]).map((d, i) => (
-                <FlipDigit key={i} digit={d} />
-              ))}
+      {/* .flip-clock holds the card dimensions the digits and the colons both
+          measure from, so the separators stay on the cards' centre line at
+          every breakpoint without repeating the numbers. */}
+      <div aria-hidden className="flip-clock flex items-start justify-center gap-1 sm:gap-2">
+        {UNITS.map((unit, i) => (
+          <Fragment key={unit.key}>
+            {i > 0 && <span className="flip-sep">:</span>}
+            <div className="flex flex-col items-center gap-2.5">
+              <div className="flex gap-1 sm:gap-1.5">
+                {digitsOf(time?.[unit.key]).map((d, j) => (
+                  <FlipDigit key={j} digit={d} />
+                ))}
+              </div>
+              <span className="text-[9px] font-medium uppercase tracking-[0.2em] text-white/40">
+                {unit.label}
+              </span>
             </div>
-            <span className="text-[9px] font-medium uppercase tracking-[0.22em] text-white/45 sm:text-[10px]">
-              {unit.label}
-            </span>
-          </div>
+          </Fragment>
         ))}
       </div>
     </div>

@@ -155,7 +155,7 @@ export default function Leaderboard() {
                 style={{ color: meta.tint, filter: `drop-shadow(0 0 14px ${meta.tint})` }}
               />
               <p
-                className="font-display text-center text-xl font-black leading-none sm:text-3xl"
+                className="font-display text-center text-lg font-semibold leading-none sm:text-2xl"
                 style={{ color: dept.accent }}
               >
                 {dept.code}
@@ -182,7 +182,7 @@ export default function Leaderboard() {
                   className="absolute inset-0 opacity-25"
                   style={{ background: `linear-gradient(to top, ${dept.accent}, transparent 70%)` }}
                 />
-                <span className="font-display absolute inset-x-0 bottom-3 text-center text-3xl font-black text-white/25 sm:text-5xl">
+                <span className="font-display absolute inset-x-0 bottom-3 text-center text-2xl font-semibold text-white/20 sm:text-4xl">
                   {meta.rank}
                 </span>
               </motion.div>
@@ -240,7 +240,7 @@ export default function Leaderboard() {
                     aria-controls={`ledger-${dept.code}`}
                     className="relative flex w-full items-center gap-4 px-4 py-4 text-left sm:px-6"
                   >
-                    <span className="font-display w-8 shrink-0 text-center text-lg font-black tabular-nums text-white/30 sm:text-xl">
+                    <span className="font-display w-8 shrink-0 text-center text-base font-semibold tabular-nums text-white/30 sm:text-lg">
                       <span className="sr-only">Rank </span>
                       {String(dept.rank).padStart(2, "0")}
                     </span>
@@ -253,7 +253,7 @@ export default function Leaderboard() {
 
                     <span className="min-w-0 flex-1">
                       <span
-                        className="font-display block text-lg font-bold leading-tight sm:text-xl"
+                        className="font-display block text-base font-semibold leading-tight sm:text-lg"
                         style={{ color: dept.accent }}
                       >
                         {dept.code}
@@ -291,7 +291,7 @@ export default function Leaderboard() {
                     </span>
 
                     <span className="w-20 shrink-0 text-right sm:w-24">
-                      <span className="font-display block text-2xl font-bold tabular-nums text-cream-100 sm:text-3xl">
+                      <span className="font-display block text-xl font-semibold tabular-nums text-cream-100 sm:text-2xl">
                         <Counter value={dept.points} />
                       </span>
                       <span className="block text-[10px] uppercase tracking-[0.2em] text-white/35">

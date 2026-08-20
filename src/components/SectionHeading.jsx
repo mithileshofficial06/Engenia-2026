@@ -53,13 +53,13 @@ export default function SectionHeading({
         accent={accent}
         swash
         delay={140}
-        className="text-fest font-display text-balance text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl"
+        className="text-fest font-display text-balance text-[1.6rem] font-semibold leading-[1.12] tracking-tight sm:text-[2rem] md:text-[2.4rem]"
       />
 
       {subtitle && (
         <p
           style={{ "--rise-delay": "420ms" }}
-          className={`rise-up max-w-2xl text-pretty text-base leading-relaxed text-cream-300/60 sm:text-lg ${
+          className={`rise-up max-w-xl text-pretty text-sm leading-relaxed text-cream-300/60 sm:text-base ${
             align === "center" ? "mx-auto" : ""
           }`}
         >

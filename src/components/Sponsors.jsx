@@ -66,7 +66,7 @@ export default function Sponsors() {
               />
             </div>
 
-            <p className="font-display relative mt-6 text-2xl font-bold text-cream-100 sm:text-3xl">
+            <p className="font-display relative mt-6 text-xl font-semibold text-cream-100 sm:text-2xl">
               {titleSponsor.name}
             </p>
           </div>

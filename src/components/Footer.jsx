@@ -17,7 +17,7 @@ export default function Footer() {
           <p className="mt-5 max-w-sm text-pretty text-sm leading-relaxed text-white/50">
             {festival.college}.
           </p>
-          <p className="text-fest font-display mt-5 text-lg font-bold">{festival.tagline}</p>
+          <p className="text-fest font-display mt-5 text-base font-semibold">{festival.tagline}</p>
         </div>
 
         <nav aria-label="Footer">
