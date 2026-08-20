@@ -292,7 +292,7 @@ export default function Highlights() {
                 type="button"
                 onClick={() => manual(prev)}
                 aria-label="Previous highlight"
-                className="glass flex h-9 w-9 items-center justify-center text-white/70 transition hover:bg-white/[0.08] hover:text-cream-100"
+                className="glass flex h-11 w-11 items-center justify-center text-white/70 transition hover:bg-white/[0.08] hover:text-cream-100 sm:h-9 sm:w-9"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -305,7 +305,8 @@ export default function Highlights() {
                     onClick={() => manual(() => goTo(i))}
                     aria-label={`Go to highlight ${i + 1}`}
                     aria-current={active === i}
-                    className={`h-1.5 transition-all duration-300 ${
+                    style={{ "--tap-w": "1.5rem" }}
+                    className={`tap-target h-1.5 transition-all duration-300 ${
                       active === i
                         ? "bg-fest w-7"
                         : "w-1.5 bg-white/25 hover:bg-white/45"
@@ -318,7 +319,7 @@ export default function Highlights() {
                 type="button"
                 onClick={() => manual(next)}
                 aria-label="Next highlight"
-                className="glass flex h-9 w-9 items-center justify-center text-white/70 transition hover:bg-white/[0.08] hover:text-cream-100"
+                className="glass flex h-11 w-11 items-center justify-center text-white/70 transition hover:bg-white/[0.08] hover:text-cream-100 sm:h-9 sm:w-9"
               >
                 <ChevronRight size={16} />
               </button>

@@ -98,9 +98,14 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center gap-2">
+            {/* Held back until lg. Between the md breakpoint and 1024px the
+                bar is asking for 727px of logo, five links, this button and the
+                crest inside 656px, and the button is what loses — it wrapped to
+                two lines and pushed the whole bar 3px taller. Nothing becomes
+                unreachable: Events is one of the five links beside it. */}
             <Link
               href="/events"
-              className="btn btn-solid hidden px-6 py-3 text-sm font-semibold md:inline-block"
+              className="btn btn-solid hidden whitespace-nowrap px-6 py-3 text-sm font-semibold lg:inline-block"
             >
               Explore Events
             </Link>

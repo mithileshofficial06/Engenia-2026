@@ -42,7 +42,7 @@ function Pill({ active, group, children, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`relative px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition-colors ${
+      className={`relative px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] transition-colors sm:py-2 ${
         active ? "text-ink-950" : "text-cream-400/70 hover:text-cream-100"
       }`}
     >
@@ -382,7 +382,7 @@ function EventModal({ event, onClose }) {
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center bg-cream-100/[0.08] text-cream-300/80 transition hover:bg-cream-100/15 hover:text-cream-100"
+          className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center bg-cream-100/[0.08] text-cream-300/80 transition hover:bg-cream-100/15 hover:text-cream-100 sm:h-9 sm:w-9"
         >
           <X size={16} />
         </button>

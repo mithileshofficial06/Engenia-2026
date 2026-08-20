@@ -127,11 +127,23 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 6rem;
+  /* `clip`, not `hidden`.
+     Scroll-triggered entrances park their content off to one side until they
+     fire — Reveal's horizontal variants sit 48px out — so on a narrow screen
+     the layout is momentarily wider than the viewport even though nothing is
+     meant to be reachable out there. `hidden` on <body> already refuses that
+     scroll, but it does so by making the viewport a scroll container, which
+     is the arrangement iOS Safari will still let a finger rubber-band
+     sideways into. `clip` refuses outright and creates no scroll container,
+     so `position: sticky` inside the page keeps working. */
+  overflow-x: clip;
 }
 
 body {
   background: var(--color-ink-950);
   color: #f5ecdd;
+  /* Fallback for engines without `overflow: clip`. Where both are understood,
+     the rule on <html> above is the one that decides. */
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -806,5 +818,66 @@ body {
   @keyframes arc-drop {
     from { clip-path: inset(0 0 100% 0); }
     to   { clip-path: inset(0 0 0 0); }
+  }
+}
+
+/* ── Phones held sideways ─────────────────────────────────────────────
+   A phone in landscape is around 390px tall, and the hero is laid out
+   entirely off the *long* axis: the wordmark takes its size from the width,
+   which at 844px across works out at 358px of artwork before the headline,
+   the counter or the buttons have had a single pixel. The opening screen was
+   therefore the wordmark and nothing else, with everything that tells you
+   what the site is sitting below the fold.
+
+   So on a short viewport the wordmark is sized off the short axis instead.
+   `height` with `width: auto` lets the slot derive its own width from the
+   aspect ratio Hero already sets inline — the number is not repeated here,
+   and WordmarkFlight goes on measuring the slot exactly as before.
+
+   Bounded by height, not by a device guess. Portrait phones, every tablet in
+   both orientations and every desktop are taller than this and never match,
+   so the layout they get is untouched. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .hero-shell {
+    padding-top: 4.5rem;
+    padding-bottom: 2rem;
+  }
+
+  .hero-slot {
+    width: auto;
+    max-width: 100%;
+    height: 30svh;
+  }
+
+  /* The rhythm below the wordmark, compressed to match. Same order, same
+     entrances — only the gaps between them give ground. */
+  .hero-shell .hero-headline { margin-top: 0.5rem; }
+  .hero-shell .hero-meta { margin-top: 0.85rem; }
+  .hero-shell .hero-counter { margin-top: 1.1rem; }
+  .hero-shell .hero-cta { margin-top: 1.25rem; }
+}
+
+/* ── Touch targets ────────────────────────────────────────────────────
+   Pointer-driven, not width-driven. `pointer: coarse` is true of a finger and
+   false of a mouse, which is the actual distinction being drawn here — a
+   narrow desktop window is still being clicked with something precise, and a
+   large tablet still is not.
+
+   The hit area is an invisible pseudo-element rather than padding on the
+   control, so nothing moves: the dot stays the 6px it is drawn as on every
+   device, and only the region that answers a tap grows around it. */
+@media (pointer: coarse) {
+  .tap-target {
+    position: relative;
+  }
+
+  .tap-target::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--tap-w, 2.75rem);
+    height: var(--tap-h, 2.75rem);
+    transform: translate(-50%, -50%);
   }
 }

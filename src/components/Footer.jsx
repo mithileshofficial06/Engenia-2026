@@ -27,7 +27,7 @@ export default function Footer() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="group inline-flex items-center gap-2 text-sm text-white/60 transition-colors hover:text-cream-100"
+                  className="group inline-flex items-center gap-2 py-2.5 text-sm text-white/60 transition-colors hover:text-cream-100 sm:py-0"
                 >
                   <span className="bg-fest h-px w-0 transition-all duration-300 group-hover:w-4" />
                   {link.label}
@@ -46,7 +46,10 @@ export default function Footer() {
             </li>
             <li className="flex items-center gap-2.5">
               <Mail size={15} className="shrink-0 text-gold-500" />
-              <a href={`mailto:${contact.email}`} className="transition-colors hover:text-cream-100">
+              <a
+                href={`mailto:${contact.email}`}
+                className="inline-block py-2.5 transition-colors hover:text-cream-100 sm:py-0"
+              >
                 {contact.email}
               </a>
             </li>
@@ -59,7 +62,7 @@ export default function Footer() {
                 href={s.href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="btn btn-ghost px-3.5 py-1.5 text-[11px] font-medium"
+                className="btn btn-ghost px-3.5 py-3 text-[11px] font-medium sm:py-1.5"
               >
                 {s.label}
               </a>

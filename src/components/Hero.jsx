@@ -66,7 +66,7 @@ export default function Hero() {
     <section
       ref={ref}
       {...sectionAccent("ember")}
-      className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-4 pb-20 pt-28 sm:pt-32"
+      className="hero-shell relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-4 pb-20 pt-28 sm:pt-32"
     >
       {/* Glow behind the wordmark — now that the art has no black plate, this
           reads through the letters instead of sitting behind a box. */}
@@ -82,7 +82,7 @@ export default function Hero() {
         <div
           ref={heroSlot}
           aria-hidden
-          className="w-full max-w-[320px] sm:max-w-[520px] md:max-w-[660px] lg:max-w-[780px]"
+          className="hero-slot w-full max-w-[320px] sm:max-w-[520px] md:max-w-[660px] lg:max-w-[780px]"
           style={{ aspectRatio: geometry.aspect }}
         />
 
@@ -97,7 +97,7 @@ export default function Hero() {
               they are kept on separate elements. */}
           <motion.h1
             style={{ opacity: headlineFade }}
-            className="font-display mt-4 text-balance text-center text-[1.7rem] font-semibold leading-[1.14] tracking-tight sm:text-4xl md:text-[2.75rem]"
+            className="hero-headline font-display mt-4 text-balance text-center text-[1.7rem] font-semibold leading-[1.14] tracking-tight sm:text-4xl md:text-[2.75rem]"
           >
             <motion.span style={{ x: partLeft, willChange: "transform" }} className="inline-block">
               <motion.span
@@ -129,7 +129,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: LOGO_SETTLED + 0.55, duration: 0.7 }}
-              className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/55"
+              className="hero-meta mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/55"
             >
               <span className="inline-flex items-center gap-2">
                 <CalendarDays size={15} className="text-gold-500" />
@@ -146,7 +146,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: LOGO_SETTLED + 0.7, duration: 0.7 }}
-              className="mt-9"
+              className="hero-counter mt-9"
             >
               <Countdown target={festival.startsAt} />
             </motion.div>
@@ -155,7 +155,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: LOGO_SETTLED + 0.85, duration: 0.7 }}
-              className="mt-10 flex flex-col items-center gap-3 sm:flex-row"
+              className="hero-cta mt-10 flex flex-col items-center gap-3 sm:flex-row"
             >
               <Link
                 href="/events"
