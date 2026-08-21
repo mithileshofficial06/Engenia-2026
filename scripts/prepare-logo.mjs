@@ -37,6 +37,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PNG } from "pngjs";
 import jpeg from "jpeg-js";
+import sharp from "sharp";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = path.join(ROOT, "Engenia Update Logo.jpeg");
@@ -137,13 +138,53 @@ function trim(png) {
   return crop(png, left, top, right - left + 1, bottom - top + 1);
 }
 
+/** Everything emit() wrote, for the recompression pass at the end of the run. */
+const written = [];
+
 /** Writes to public/<rel> and returns the site-root URL for it. */
 function emit(rel, png) {
   const file = path.join(PUBLIC, rel);
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, PNG.sync.write(png));
+  written.push(file);
   console.log(`  public/${rel}  ${png.width}x${png.height}`);
   return `/${rel.split(path.sep).join("/")}`;
+}
+
+/**
+ * Re-encode everything emit() wrote.
+ *
+ * pngjs writes a correct PNG and makes no attempt at a small one — no adaptive
+ * filtering, minimal deflate — which landed these files at roughly a byte per
+ * pixel, near enough raw RGBA. The logo alone was 1.0 MB for 1280x745.
+ *
+ * This is lossless: identical pixels, competent encoding, about 75% smaller.
+ * Palette quantisation would take another ~9% and is deliberately not used —
+ * the artwork is a brush gradient, which is exactly what posterises worst.
+ *
+ * Worth doing even though next/image re-encodes to AVIF on the way out. The
+ * optimiser still has to read and decode this file once per variant per cold
+ * cache, and favicon.png and og.png are served raw — no next/image in front of
+ * an <link rel="icon"> or an og:image fetched by a crawler.
+ */
+async function recompress() {
+  let before = 0;
+  let after = 0;
+
+  for (const file of written) {
+    before += fs.statSync(file).size;
+    const buf = await sharp(file)
+      .png({ compressionLevel: 9, effort: 10, adaptiveFiltering: true })
+      .toBuffer();
+    fs.writeFileSync(file, buf);
+    after += buf.length;
+  }
+
+  const saved = before ? Math.round((1 - after / before) * 100) : 0;
+  console.log(
+    `  recompressed ${written.length} files  ` +
+      `${(before / 1048576).toFixed(2)} MB -> ${(after / 1048576).toFixed(2)} MB  (${saved}% smaller)`,
+  );
 }
 
 const version = crypto
@@ -243,3 +284,7 @@ const geometry = {
 const target = path.join(ROOT, "src/data/wordmark.json");
 fs.writeFileSync(target, `${JSON.stringify(geometry, null, 2)}\n`);
 console.log(`  src/data/wordmark.json  aspect ${geometry.aspect}`);
+
+// Last, so the manifest is already correct if this is interrupted — the paths
+// do not change, only the bytes behind them.
+await recompress();
