@@ -4,6 +4,7 @@ import { requireAdminPage } from "@/lib/dal";
 import { loadFest } from "@/lib/fest-server";
 import { buildStandings, buildSeason } from "@/lib/standings";
 import { MEDALS } from "@/lib/format";
+import ResetLeaderboard from "@/components/admin/ResetLeaderboard";
 
 export const metadata = { title: "Leaderboard" };
 export const dynamic = "force-dynamic";
@@ -30,6 +31,7 @@ export default async function AdminLeaderboardPage() {
   const season = buildSeason(fest.events);
   const held = fest.events.filter((e) => !e.resultsPublished && (e.winners?.length ?? 0) > 0);
   const max = full[0]?.points || 1;
+  const placings = fest.events.reduce((n, e) => n + (e.winners?.length ?? 0), 0);
 
   return (
     <div>
@@ -152,6 +154,8 @@ export default async function AdminLeaderboardPage() {
         Totals are summed from the placings on record — there is no stored score to correct.
         Fix a placing on the events page and this moves with it.
       </p>
+
+      <ResetLeaderboard placings={placings} />
     </div>
   );
 }

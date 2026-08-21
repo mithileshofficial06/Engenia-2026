@@ -250,3 +250,111 @@ export async function signOut() {
   revalidatePath("/admin", "layout");
   return { ok: true };
 }
+
+/* ── Reset ────────────────────────────────────────────────────────────── */
+
+/**
+ * Re-check the caller's own password against the auth server.
+ *
+ * requireAdmin() proves a valid session is attached to the request. It does
+ * not prove the person at the keyboard is the organiser — a laptop left open
+ * on the results desk is a signed-in session anybody can walk up to. For a
+ * destructive, fest-wide action that distinction is worth one more step.
+ *
+ * Deliberately a bare fetch rather than the SSR client: signInWithPassword on
+ * that client would write a fresh session into the caller's cookies as a side
+ * effect of *checking* a password. This asks the auth server the question and
+ * throws the answer away.
+ *
+ * The throwaway session is revoked immediately, with `scope=local` — the
+ * default is `global`, which would revoke every refresh token the user holds
+ * and sign the organiser out of the browser they are standing at, mid-fest,
+ * as a consequence of confirming a password correctly.
+ */
+async function passwordMatches(email, password) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key || !email || !password) return false;
+
+  const res = await fetch(`${url}/auth/v1/token?grant_type=password`, {
+    method: "POST",
+    headers: { apikey: key, "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+    cache: "no-store",
+  });
+
+  if (!res.ok) return false;
+
+  const session = await res.json().catch(() => null);
+  if (session?.access_token) {
+    await fetch(`${url}/auth/v1/logout?scope=local`, {
+      method: "POST",
+      headers: { apikey: key, Authorization: `Bearer ${session.access_token}` },
+    }).catch(() => {});
+  }
+  return true;
+}
+
+/**
+ * Clear the fest back to nothing scored.
+ *
+ * Two writes, in this order. Every placing on record is deleted, and every
+ * event is returned to unrevealed. Both are needed: the standings are summed
+ * from the placings, so deleting them is what zeroes the board — but an event
+ * left flagged as revealed would re-publish the moment someone typed a new
+ * result into it, announcing a placing nobody had chosen to announce.
+ *
+ * What it deliberately does not touch: points values, guidelines, dates,
+ * status, departments and announcements. Those are how the fest is *set up*,
+ * not what it has scored, and rebuilding them by hand after a mistaken reset
+ * would be the actual disaster.
+ *
+ * There is no undo. The placings are gone from the database, not archived.
+ */
+export async function resetLeaderboard(password) {
+  try {
+    const who = await requireAdmin();
+
+    if (!password?.trim()) {
+      return { ok: false, error: "Enter your password to confirm." };
+    }
+
+    if (!(await passwordMatches(who.email, password))) {
+      return {
+        ok: false,
+        error: "That password does not match your account. Nothing was changed.",
+      };
+    }
+
+    const supabase = await createSupabaseServerClient();
+
+    // Counted before the delete so the confirmation can say what actually went.
+    const { count } = await supabase
+      .from("event_winners")
+      .select("id", { count: "exact", head: true });
+
+    const { error: placingsError } = await supabase
+      .from("event_winners")
+      .delete()
+      .not("id", "is", null);
+    if (placingsError) return { ok: false, error: explain(placingsError) };
+
+    const { error: revealError } = await supabase
+      .from("events")
+      .update({ results_published: false })
+      .not("id", "is", null);
+    if (revealError) {
+      return {
+        ok: false,
+        error:
+          "The placings were cleared, but the events could not be returned to unrevealed. " +
+          "Re-run the reset. " + explain(revealError),
+      };
+    }
+
+    revalidate([...PUBLIC_PATHS, "/admin", "/admin/events", "/admin/leaderboard"]);
+    return { ok: true, cleared: count ?? 0 };
+  } catch (e) {
+    return { ok: false, error: explain(e) };
+  }
+}
