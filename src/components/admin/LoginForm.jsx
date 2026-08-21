@@ -70,7 +70,7 @@ function LoginFields() {
 
   if (!isSupabaseConfigured) {
     return (
-      <div className="glass w-full max-w-md rounded-2xl p-8 text-center">
+      <div className="glass relative z-10 w-full max-w-md rounded-2xl p-8 text-center">
         <span className="bg-arc absolute inset-x-0 top-0 h-px" />
         <AlertCircle className="mx-auto text-gold-400" size={26} />
         <h1 className="font-display mt-4 text-xl font-semibold">Supabase is not connected</h1>

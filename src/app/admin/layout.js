@@ -31,7 +31,7 @@ export default async function AdminLayout({ children }) {
   return (
     <div className="min-h-[100svh] pb-24">
       <AdminNav email={admin.email} />
-      <main className="mx-auto max-w-6xl px-4 pt-28 md:px-8">{children}</main>
+      <main className="relative z-10 mx-auto max-w-6xl px-4 pt-28 md:px-8">{children}</main>
     </div>
   );
 }
